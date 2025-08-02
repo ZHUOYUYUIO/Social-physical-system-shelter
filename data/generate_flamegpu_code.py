@@ -81,6 +81,8 @@ def initialize_student_agent_population(studentAgentPopulation, population_file=
         num_student_agents = len(agents)
         print(f"初始化 {{num_student_agents}} 个学生代理个体")
         
+        studentAgentPopulation = pyflamegpu.AgentVector(model.Agent("student_agent"), num_student_agents)
+
         for i in range(num_student_agents):
             student_agent = studentAgentPopulation[i]
             agent_data = agents[i]['variables']
@@ -94,6 +96,7 @@ def initialize_student_agent_population(studentAgentPopulation, population_file=
             student_agent.setVariableInt("point_id", agent_data['point_id'])
             student_agent.setVariableInt("floor", agent_data['floor'])
         
+        cudaSimulation.setPopulationData(studentAgentPopulation)
         print("学生代理种群初始化完成")
         
     except Exception as e:

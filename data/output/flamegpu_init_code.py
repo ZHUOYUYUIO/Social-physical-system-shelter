@@ -3,7 +3,7 @@
 """
 FlameGPU学生代理初始化代码
 基于建筑物内散点数据生成
-总散点数: 1800
+总散点数: 1542
 """
 
 import json
@@ -36,6 +36,8 @@ def initialize_student_agent_population(studentAgentPopulation, population_file=
         num_student_agents = len(agents)
         print(f"初始化 {num_student_agents} 个学生代理个体")
         
+        studentAgentPopulation = pyflamegpu.AgentVector(model.Agent("student_agent"), num_student_agents)
+
         for i in range(num_student_agents):
             student_agent = studentAgentPopulation[i]
             agent_data = agents[i]['variables']
@@ -47,10 +49,11 @@ def initialize_student_agent_population(studentAgentPopulation, population_file=
             # 设置建筑物信息
             student_agent.setVariableInt("building_id", agent_data['building_id'])
             student_agent.setVariableInt("point_id", agent_data['point_id'])
-            student_agent.setVariableInt("floor", agent_data['floor']) 
+            student_agent.setVariableInt("floor", agent_data['floor'])
         
+        cudaSimulation.setPopulationData(studentAgentPopulation)
         print("学生代理种群初始化完成")
-          
+        
     except Exception as e:
         print(f"❌ 加载人口数据失败: {e}")
 
