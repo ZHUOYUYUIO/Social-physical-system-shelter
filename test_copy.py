@@ -139,7 +139,7 @@ if pyflamegpu.VISUALISATION:
     # Set the initial camera location and speed
     INIT_CAM = WIDTH / 2
     m_vis.setInitialCameraTarget(270, 205, 0)
-    m_vis.setInitialCameraLocation(270, 205, 10)
+    m_vis.setInitialCameraLocation(270, 205, 100)
     m_vis.setCameraSpeed(0.01)
     m_vis.setSimulationSpeed(25)
     # Add "point" agents to the visualisation
