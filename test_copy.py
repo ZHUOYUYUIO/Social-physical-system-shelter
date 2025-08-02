@@ -24,12 +24,15 @@ message.setRadius(2)
 # X Y (Z) are implicit for spatial messages
 message.newVariableID("id")
 
-# Define an agent named point
-agent = model.newAgent("point")
+
 # Assign the agent some variables (ID is implicit to agents, so we don't define it ourselves)
-agent.newVariableFloat("x")
-agent.newVariableFloat("y")
-agent.newVariableFloat("drift", 0) #这个会被随机分配到新created or newly birthed agents
+student_agent = model.newAgent("student_agent")
+student_agent.newVariableFloat("x")
+student_agent.newVariableFloat("y")
+student_agent.newVariableInt("building_id")
+student_agent.newVariableInt("point_id")
+student_agent.newVariableInt("floor")
+student_agent.newVariableFloat("drift", 0)
 
 # Define environment properties
 env = model.Environment()
@@ -81,69 +84,81 @@ def input_message(message_in: pyflamegpu.MessageSpatial2D, message_out: pyflameg
 output_func_translated = pyflamegpu.codegen.translate(output_message)
 input_func_translated = pyflamegpu.codegen.translate(input_message)
 # Setup the two agent functions
-out_fn = agent.newRTCFunction("output_message", output_func_translated)
+out_fn = student_agent.newRTCFunction("output_message", output_func_translated)
 out_fn.setMessageOutput("location")
-in_fn = agent.newRTCFunction("input_message", input_func_translated)
+in_fn = student_agent.newRTCFunction("input_message", input_func_translated)
 in_fn.setMessageInput("location")
 
 # Message input depends on output
 in_fn.dependsOn(out_fn)
+
+# 添加学生代理类型
+# 基于data/output/flamegpu_init_code.py的学生代理初始化
+
+
 # Dependency specification
 # Output is the root of our graph
 model.addExecutionRoot(out_fn)
 model.generateLayers()
 
-class create_agents(pyflamegpu.HostFunction):
-    def run(self, FLAMEGPU):
-        # Fetch the desired agent count and environment width
-        AGENT_COUNT = FLAMEGPU.environment.getPropertyUInt("AGENT_COUNT")
-        ENV_WIDTH = FLAMEGPU.environment.getPropertyFloat("ENV_WIDTH")
-        # Create agents
-        t_pop = FLAMEGPU.agent("point")
-        for i in range(AGENT_COUNT):
-            t = t_pop.newAgent()
-            t.setVariableFloat("x", FLAMEGPU.random.uniformFloat() * ENV_WIDTH)
-            t.setVariableFloat("y", FLAMEGPU.random.uniformFloat() * ENV_WIDTH)
 
-model.addInitFunction(create_agents()) 
+# Create and init the simulation
+cuda_model = pyflamegpu.CUDASimulation(model)
+
+# 导入flamegpu_init_code.py中的初始化函数
+import sys 
+import os
+sys.path.append('data/output')
+from flamegpu_init_code import initialize_student_agent_population
+
+# 初始化学生代理种群
+initialize_student_agent_population(model, cuda_model)
 
 # Specify the desired StepLoggingConfig
 step_log_cfg = pyflamegpu.StepLoggingConfig(model)
 # Log every step
 step_log_cfg.setFrequency(1)
 # Include the mean of the "point" agent population's variable 'drift'
-step_log_cfg.agent("point").logMeanFloat("drift")
+step_log_cfg.agent("student_agent").logMeanFloat("drift")
+step_log_cfg.agent("student_agent").logMeanFloat("x")
+step_log_cfg.agent("student_agent").logMeanFloat("y")
 
-# Create and init the simulation
-cuda_model = pyflamegpu.CUDASimulation(model)
+
 cuda_model.initialise(sys.argv)
+
 
 # Attach the logging config
 cuda_model.setStepLog(step_log_cfg)
+
+WIDTH=500
 
 # Only run this block if pyflamegpu was built with visualisation support
 if pyflamegpu.VISUALISATION:
     # Create visualisation
     m_vis = cuda_model.getVisualisation()
     # Set the initial camera location and speed
-    INIT_CAM = ENV_WIDTH / 2
-    m_vis.setInitialCameraTarget(INIT_CAM, INIT_CAM, 0)
-    m_vis.setInitialCameraLocation(INIT_CAM, INIT_CAM, ENV_WIDTH)
+    INIT_CAM = WIDTH / 2
+    m_vis.setInitialCameraTarget(270, 205, 0)
+    m_vis.setInitialCameraLocation(270, 205, 10)
     m_vis.setCameraSpeed(0.01)
     m_vis.setSimulationSpeed(25)
     # Add "point" agents to the visualisation
-    point_agt = m_vis.addAgent("point")
-    # Location variables have names "x" and "y" so will be used by default
-    point_agt.setModel(pyflamegpu.ICOSPHERE);
-    point_agt.setModelScale(1/10.0);
-    # Mark the environment bounds
+
+    
+    # Add "student_agent" agents to the visualisation
+    student_agt = m_vis.addAgent("student_agent")
+    student_agt.setModel(pyflamegpu.ICOSPHERE);
+    student_agt.setModelScale(1/8.0);
+    # Mark the environment bounds.
+
+    
     pen = m_vis.newPolylineSketch(1, 1, 1, 0.2)
-    pen.addVertex(0, 0, 0)
-    pen.addVertex(0, ENV_WIDTH, 0)
-    pen.addVertex(ENV_WIDTH, ENV_WIDTH, 0)
-    pen.addVertex(ENV_WIDTH, 0, 0)
-    pen.addVertex(0, 0, 0)
-    # Open the visualiser window
+    pen.addVertex(157, 123, 0) #左下
+    pen.addVertex(157, 287, 0)  #左上
+    pen.addVertex(384, 287, 0) #右上
+    pen.addVertex(384, 123, 0) #右下
+    pen.addVertex(157, 123, 0) #左下
+    # Open the visualiser window 
     m_vis.activate()
 
 # Run the simulation

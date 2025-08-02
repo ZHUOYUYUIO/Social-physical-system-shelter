@@ -54,7 +54,7 @@ def input_message(message_in: pyflamegpu.MessageSpatial2D, message_out: pyflameg
     fy = 0.0
     x1 = pyflamegpu.getVariableFloat("x")
     y1 = pyflamegpu.getVariableFloat("y")
-    count = 0
+    count = 0 
     for message in message_in(x1, y1):
         if message.getVariableUInt("id") != ID :
             x2 = message.getVariableFloat("x")
@@ -93,6 +93,7 @@ in_fn.dependsOn(out_fn)
 model.addExecutionRoot(out_fn)
 model.generateLayers()
 
+'''
 class create_agents(pyflamegpu.HostFunction):
     def run(self, FLAMEGPU):
         # Fetch the desired agent count and environment width
@@ -106,6 +107,8 @@ class create_agents(pyflamegpu.HostFunction):
             t.setVariableFloat("y", FLAMEGPU.random.uniformFloat() * ENV_WIDTH)
 
 model.addInitFunction(create_agents()) 
+'''
+
 
 # Specify the desired StepLoggingConfig
 step_log_cfg = pyflamegpu.StepLoggingConfig(model)
@@ -116,6 +119,18 @@ step_log_cfg.agent("point").logMeanFloat("drift")
 
 # Create and init the simulation
 cuda_model = pyflamegpu.CUDASimulation(model)
+
+import random
+
+AgentPopulation = pyflamegpu.AgentVector(model.Agent("point"), AGENT_COUNT)
+for i in range(AGENT_COUNT):
+    agent = AgentPopulation[i]
+    agent.setVariableFloat("x", random.uniform(0, 1000))
+    agent.setVariableFloat("y", random.uniform(0, 1000))
+
+cuda_model.setPopulationData(AgentPopulation)
+
+
 cuda_model.initialise(sys.argv)
 
 # Attach the logging config
@@ -140,7 +155,7 @@ if pyflamegpu.VISUALISATION:
     pen = m_vis.newPolylineSketch(1, 1, 1, 0.2)
     pen.addVertex(0, 0, 0)
     pen.addVertex(0, ENV_WIDTH, 0)
-    pen.addVertex(ENV_WIDTH, ENV_WIDTH, 0)
+    pen.addVertex(ENV_WIDTH, ENV_WIDTH, 0) 
     pen.addVertex(ENV_WIDTH, 0, 0)
     pen.addVertex(0, 0, 0)
     # Open the visualiser window

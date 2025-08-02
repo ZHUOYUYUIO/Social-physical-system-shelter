@@ -53,16 +53,21 @@ FlameGPU学生代理初始化代码
 
 import json
 import os
+from pyflamegpu import *
+import pyflamegpu.codegen
+import sys
 
-def initialize_student_agent_population(studentAgentPopulation, population_file='data/output/population_points.json'):
+def initialize_student_agent_population(model, cuda_model, population_file='data/output/population_points.json'):
     """
     初始化学生代理种群
     使用从建筑物散点生成的数据
     
     Parameters:
     -----------
-    studentAgentPopulation : list
-        FlameGPU学生代理种群列表
+    model : pyflamegpu.ModelDescription
+        FlameGPU模型描述对象
+    cuda_model : pyflamegpu.CUDASimulation
+        CUDA模拟对象
     population_file : str
         人口数据JSON文件路径
     """
@@ -85,7 +90,7 @@ def initialize_student_agent_population(studentAgentPopulation, population_file=
 
         for i in range(num_student_agents):
             student_agent = studentAgentPopulation[i]
-            agent_data = agents[i]['variables']
+            agent_data = agents[i]['variables'] 
             
             # 设置位置坐标
             student_agent.setVariableFloat("x", agent_data['x'])
@@ -96,7 +101,7 @@ def initialize_student_agent_population(studentAgentPopulation, population_file=
             student_agent.setVariableInt("point_id", agent_data['point_id'])
             student_agent.setVariableInt("floor", agent_data['floor'])
         
-        cudaSimulation.setPopulationData(studentAgentPopulation)
+        cuda_model.setPopulationData(studentAgentPopulation)
         print("学生代理种群初始化完成")
         
     except Exception as e:
