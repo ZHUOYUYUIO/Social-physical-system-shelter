@@ -218,7 +218,7 @@ class PopulationPointGenerator:
         # 转换为FlameGPU格式
         flamegpu_data = {
             "agents": {
-                "prey": {
+                "student_agent": {
                     "variables": {
                         "x": {"type": "float", "default": 0.0},
                         "y": {"type": "float", "default": 0.0},
@@ -246,7 +246,7 @@ class PopulationPointGenerator:
                     "floor": point['floor']
                 }
             }
-            flamegpu_data["agents"]["prey"]["states"]["default"]["agents"].append(agent_data)
+            flamegpu_data["agents"]["student_agent"]["states"]["default"]["agents"].append(agent_data)
         
         # 保存JSON文件
         with open(output_file, 'w', encoding='utf-8') as f:
@@ -335,31 +335,31 @@ FlameGPU人口散点初始化代码
 
 import random
 
-def initialize_prey_population(preyPopulation):
+def initialize_student_agent_population(studentAgentPopulation):
     """
-    初始化猎物种群
+    初始化学生代理种群
     使用从建筑物散点生成的数据
     """
     # 从JSON文件加载的散点数据
     population_data = {points_str}
     
-    num_prey = len(population_data)
-    print(f"初始化 {{num_prey}} 个猎物个体")
+    num_student_agents = len(population_data)
+    print(f"初始化 {{num_student_agents}} 个学生代理个体")
     
-    for i in range(num_prey):
-        prey = preyPopulation[i]
+    for i in range(num_student_agents):
+        student_agent = studentAgentPopulation[i]
         point_data = population_data[i]
         
         # 设置位置坐标
-        prey.setVariableFloat("x", point_data['x'])
-        prey.setVariableFloat("y", point_data['y'])
+        student_agent.setVariableFloat("x", point_data['x'])
+        student_agent.setVariableFloat("y", point_data['y'])
         
         # 设置建筑物信息
-        prey.setVariableInt("building_id", point_data['building_id'])
-        prey.setVariableInt("point_id", point_data['point_id'])
-        prey.setVariableInt("floor", point_data['floor'])
+        student_agent.setVariableInt("building_id", point_data['building_id'])
+        student_agent.setVariableInt("point_id", point_data['point_id'])
+        student_agent.setVariableInt("floor", point_data['floor'])
     
-    print("猎物种群初始化完成")
+    print("学生代理种群初始化完成")
 
 # 使用示例：
 # from flamegpu import *
@@ -368,16 +368,16 @@ def initialize_prey_population(preyPopulation):
 # model = pyflamegpu.ModelDescription("Population Model")
 # 
 # # 添加代理类型
-# prey = model.newAgent("prey")
-# prey.newVariableFloat("x")
-# prey.newVariableFloat("y")
-# prey.newVariableInt("building_id")
-# prey.newVariableInt("point_id")
-# prey.newVariableInt("floor")
+# student_agent = model.newAgent("student_agent")
+# student_agent.newVariableFloat("x")
+# student_agent.newVariableFloat("y")
+# student_agent.newVariableInt("building_id")
+# student_agent.newVariableInt("point_id")
+# student_agent.newVariableInt("floor")
 # 
 # # 初始化种群
 # init_population = model.newAgentFunction("init_population")
-# init_population.setFunction(initialize_prey_population)
+# init_population.setFunction(initialize_student_agent_population)
 # 
 # # 运行模型...
 '''

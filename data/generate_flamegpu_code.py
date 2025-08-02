@@ -34,7 +34,7 @@ def generate_flamegpu_init_code(population_file='data/output/population_points.j
             data = json.load(f)
         
         # 提取散点数据
-        agents = data['agents']['prey']['states']['default']['agents']
+        agents = data['agents']['student_agent']['states']['default']['agents']
         
         if not agents:
             print("❌ 人口数据为空")
@@ -46,47 +46,58 @@ def generate_flamegpu_init_code(population_file='data/output/population_points.j
         code = f'''#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-FlameGPU猎物种群初始化代码
+FlameGPU学生代理初始化代码
 基于建筑物内散点数据生成
 总散点数: {len(agents)}
 """
 
-import random
+import json
+import os
 
-def initialize_prey_population(preyPopulation):
+def initialize_student_agent_population(studentAgentPopulation, population_file='data/output/population_points.json'):
     """
-    初始化猎物种群
+    初始化学生代理种群
     使用从建筑物散点生成的数据
+    
+    Parameters:
+    -----------
+    studentAgentPopulation : list
+        FlameGPU学生代理种群列表
+    population_file : str
+        人口数据JSON文件路径
     """
-    # 散点数据（从JSON文件加载）
-    population_data = [
-'''
-        
-        # 添加所有散点数据
-        for i, agent in enumerate(agents):
-            variables = agent['variables']
-            code += f'''        {{'x': {variables['x']}, 'y': {variables['y']}, 'building_id': {variables['building_id']}, 'point_id': {variables['point_id']}, 'floor': {variables['floor']}}}{',' if i < len(agents) - 1 else ''}
-'''
-        
-        code += f'''    ]
+    # 从JSON文件加载散点数据
+    if not os.path.exists(population_file):
+        print(f"❌ 找不到人口数据文件: {{population_file}}")
+        return
     
-    num_prey = len(population_data)
-    print(f"初始化 {{num_prey}} 个猎物个体")
-    
-    for i in range(num_prey):
-        prey = preyPopulation[i]
-        point_data = population_data[i]
+    try:
+        with open(population_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
         
-        # 设置位置坐标
-        prey.setVariableFloat("x", point_data['x'])
-        prey.setVariableFloat("y", point_data['y'])
+        # 提取学生代理数据
+        agents = data['agents']['student_agent']['states']['default']['agents']
         
-        # 设置建筑物信息
-        prey.setVariableInt("building_id", point_data['building_id'])
-        prey.setVariableInt("point_id", point_data['point_id'])
-        prey.setVariableInt("floor", point_data['floor'])
-    
-    print("猎物种群初始化完成")
+        num_student_agents = len(agents)
+        print(f"初始化 {{num_student_agents}} 个学生代理个体")
+        
+        for i in range(num_student_agents):
+            student_agent = studentAgentPopulation[i]
+            agent_data = agents[i]['variables']
+            
+            # 设置位置坐标
+            student_agent.setVariableFloat("x", agent_data['x'])
+            student_agent.setVariableFloat("y", agent_data['y'])
+            
+            # 设置建筑物信息
+            student_agent.setVariableInt("building_id", agent_data['building_id'])
+            student_agent.setVariableInt("point_id", agent_data['point_id'])
+            student_agent.setVariableInt("floor", agent_data['floor'])
+        
+        print("学生代理种群初始化完成")
+        
+    except Exception as e:
+        print(f"❌ 加载人口数据失败: {{e}}")
 
 # 使用示例：
 # from flamegpu import *
@@ -95,16 +106,16 @@ def initialize_prey_population(preyPopulation):
 # model = pyflamegpu.ModelDescription("Population Model")
 # 
 # # 添加代理类型
-# prey = model.newAgent("prey")
-# prey.newVariableFloat("x")
-# prey.newVariableFloat("y")
-# prey.newVariableInt("building_id")
-# prey.newVariableInt("point_id")
-# prey.newVariableInt("floor")
+# student_agent = model.newAgent("student_agent")
+# student_agent.newVariableFloat("x")
+# student_agent.newVariableFloat("y")
+# student_agent.newVariableInt("building_id")
+# student_agent.newVariableInt("point_id")
+# student_agent.newVariableInt("floor")
 # 
 # # 初始化种群
 # init_population = model.newAgentFunction("init_population")
-# init_population.setFunction(initialize_prey_population)
+# init_population.setFunction(initialize_student_agent_population)
 # 
 # # 运行模型...
 '''
@@ -141,32 +152,32 @@ def generate_random_version(output_file, num_points):
     code = f'''#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-FlameGPU猎物种群初始化代码（随机分布版本）
+FlameGPU学生代理初始化代码（随机分布版本）
 散点数: {num_points}
 """
 
 import random
 
-def initialize_prey_population(preyPopulation):
+def initialize_student_agent_population(studentAgentPopulation):
     """
-    初始化猎物种群（随机分布）
+    初始化学生代理种群（随机分布）
     """
-    num_prey = {num_points}
-    print(f"初始化 {{num_prey}} 个猎物个体（随机分布）")
+    num_student_agents = {num_points}
+    print(f"初始化 {{num_student_agents}} 个学生代理个体（随机分布）")
     
-    for i in range(num_prey):
-        prey = preyPopulation[i]
+    for i in range(num_student_agents):
+        student_agent = studentAgentPopulation[i]
         
         # 随机设置位置坐标（在-1.0到1.0范围内）
-        prey.setVariableFloat("x", random.uniform(-1.0, 1.0))
-        prey.setVariableFloat("y", random.uniform(-1.0, 1.0))
+        student_agent.setVariableFloat("x", random.uniform(-1.0, 1.0))
+        student_agent.setVariableFloat("y", random.uniform(-1.0, 1.0))
         
         # 设置建筑物信息（随机分配）
-        prey.setVariableInt("building_id", random.randint(0, 5))  # 假设有6个建筑物
-        prey.setVariableInt("point_id", i)
-        prey.setVariableInt("floor", random.randint(1, 6))  # 随机楼层1-6层
+        student_agent.setVariableInt("building_id", random.randint(0, 5))  # 假设有6个建筑物
+        student_agent.setVariableInt("point_id", i)
+        student_agent.setVariableInt("floor", random.randint(1, 6))  # 随机楼层1-6层
     
-    print("猎物种群初始化完成（随机分布）")
+    print("学生代理种群初始化完成（随机分布）")
 
 # 使用示例：
 # from flamegpu import *
@@ -175,16 +186,16 @@ def initialize_prey_population(preyPopulation):
 # model = pyflamegpu.ModelDescription("Population Model")
 # 
 # # 添加代理类型
-# prey = model.newAgent("prey")
-# prey.newVariableFloat("x")
-# prey.newVariableFloat("y")
-# prey.newVariableInt("building_id")
-# prey.newVariableInt("point_id")
-# prey.newVariableInt("floor")
+# student_agent = model.newAgent("student_agent")
+# student_agent.newVariableFloat("x")
+# student_agent.newVariableFloat("y")
+# student_agent.newVariableInt("building_id")
+# student_agent.newVariableInt("point_id")
+# student_agent.newVariableInt("floor")
 # 
 # # 初始化种群
 # init_population = model.newAgentFunction("init_population")
-# init_population.setFunction(initialize_prey_population)
+# init_population.setFunction(initialize_student_agent_population)
 # 
 # # 运行模型...
 '''
