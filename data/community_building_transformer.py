@@ -6,9 +6,10 @@
 功能：
 1. 读取社区边界polygon文件
 2. 读取建筑物polygon文件
-3. 识别坐标系并转换为EPSG:3415
-4. 将左下角设置为(0,0)原点
-5. 保存转换后的数据
+3. 读取楼梯间polygon文件
+4. 识别坐标系并转换为EPSG:3415
+5. 将左下角设置为(0,0)原点
+6. 保存转换后的数据
 """
 
 import geopandas as gpd
@@ -99,9 +100,40 @@ class CommunityBuildingTransformer:
             print(f"加载建筑物文件失败: {e}")
             raise
     
-    def check_coordinate_systems(self, boundary_gdf, buildings_gdf):
+    def load_stairwell(self, file_path):
         """
-        检查两个数据集的坐标系是否一致
+        加载楼梯间数据
+        
+        Parameters:
+        -----------
+        file_path : str
+            楼梯间文件路径（支持shp, geojson, gpkg等格式）
+            
+        Returns:
+        --------
+        GeoDataFrame : 楼梯间数据
+        """
+        try:
+            print(f"正在加载楼梯间文件: {file_path}")
+            stairwell_gdf = gpd.read_file(file_path)
+            
+            # 检查数据
+            if len(stairwell_gdf) == 0:
+                raise ValueError("楼梯间文件为空")
+            
+            print(f"成功加载楼梯间数据，共 {len(stairwell_gdf)} 个楼梯间")
+            print(f"坐标系: {stairwell_gdf.crs}")
+            print(f"边界框: {stairwell_gdf.total_bounds}")
+            
+            return stairwell_gdf
+            
+        except Exception as e:
+            print(f"加载楼梯间文件失败: {e}")
+            raise
+    
+    def check_coordinate_systems(self, boundary_gdf, buildings_gdf, stairwell_gdf=None):
+        """
+        检查数据集的坐标系是否一致
         
         Parameters:
         -----------
@@ -109,6 +141,8 @@ class CommunityBuildingTransformer:
             社区边界数据
         buildings_gdf : GeoDataFrame
             建筑物数据
+        stairwell_gdf : GeoDataFrame, optional
+            楼梯间数据
             
         Returns:
         --------
@@ -120,12 +154,23 @@ class CommunityBuildingTransformer:
         print(f"社区边界坐标系: {boundary_crs}")
         print(f"建筑物坐标系: {buildings_crs}")
         
-        if boundary_crs == buildings_crs:
-            print("✓ 两个数据集的坐标系一致")
-            return True
+        if stairwell_gdf is not None:
+            stairwell_crs = stairwell_gdf.crs
+            print(f"楼梯间坐标系: {stairwell_crs}")
+            
+            if boundary_crs == buildings_crs == stairwell_crs:
+                print("✓ 所有数据集的坐标系一致")
+                return True
+            else:
+                print("⚠ 数据集的坐标系不一致，需要统一转换")
+                return False
         else:
-            print("⚠ 两个数据集的坐标系不一致，需要统一转换")
-            return False
+            if boundary_crs == buildings_crs:
+                print("✓ 两个数据集的坐标系一致")
+                return True
+            else:
+                print("⚠ 两个数据集的坐标系不一致，需要统一转换")
+                return False
     
     def transform_to_target_crs(self, geodata):
         """
@@ -152,9 +197,9 @@ class CommunityBuildingTransformer:
             print(f"数据已经是目标坐标系 {self.target_crs}，无需转换")
             return geodata
     
-    def set_origin_to_bottom_left(self, boundary_gdf, buildings_gdf):
+    def set_origin_to_bottom_left(self, boundary_gdf, buildings_gdf, stairwell_gdf=None):
         """
-        将社区边界和建筑物的左下角设置为(0,0)原点
+        将社区边界、建筑物和楼梯间的左下角设置为(0,0)原点
         
         Parameters:
         -----------
@@ -162,22 +207,32 @@ class CommunityBuildingTransformer:
             社区边界数据
         buildings_gdf : GeoDataFrame
             建筑物数据
+        stairwell_gdf : GeoDataFrame, optional
+            楼梯间数据
             
         Returns:
         --------
-        tuple : (转换后的边界数据, 转换后的建筑物数据, 偏移量)
+        tuple : (转换后的边界数据, 转换后的建筑物数据, 转换后的楼梯间数据, 偏移量)
         """
-        # 计算整体边界框（包含边界和建筑物）
+        # 计算整体边界框（包含边界、建筑物和楼梯间）
         boundary_bounds = boundary_gdf.total_bounds
         buildings_bounds = buildings_gdf.total_bounds
         
-        # 计算整体边界
         overall_bounds = [
             min(boundary_bounds[0], buildings_bounds[0]),  # minx
             min(boundary_bounds[1], buildings_bounds[1]),  # miny
             max(boundary_bounds[2], buildings_bounds[2]),  # maxx
             max(boundary_bounds[3], buildings_bounds[3])   # maxy
         ]
+        
+        if stairwell_gdf is not None:
+            stairwell_bounds = stairwell_gdf.total_bounds
+            overall_bounds = [
+                min(overall_bounds[0], stairwell_bounds[0]),  # minx
+                min(overall_bounds[1], stairwell_bounds[1]),  # miny
+                max(overall_bounds[2], stairwell_bounds[2]),  # maxx
+                max(overall_bounds[3], stairwell_bounds[3])   # maxy
+            ]
         
         minx, miny = overall_bounds[0], overall_bounds[1]
         offset = (minx, miny)
@@ -203,9 +258,20 @@ class CommunityBuildingTransformer:
         transformed_buildings = buildings_gdf.copy()
         transformed_buildings.geometry = transformed_buildings.geometry.apply(translate_building_geometry)
         
-        return transformed_boundary, transformed_buildings, offset
+        # 转换楼梯间
+        transformed_stairwell = None
+        if stairwell_gdf is not None:
+            def translate_stairwell_geometry(geom):
+                if geom is not None:
+                    return transform(lambda x, y: (x - minx, y - miny), geom)
+                return None
+            
+            transformed_stairwell = stairwell_gdf.copy()
+            transformed_stairwell.geometry = transformed_stairwell.geometry.apply(translate_stairwell_geometry)
+        
+        return transformed_boundary, transformed_buildings, transformed_stairwell, offset
     
-    def process_community_data(self, boundary_file, buildings_file):
+    def process_community_data(self, boundary_file, buildings_file, stairwell_file=None):
         """
         完整的社区数据处理流程
         
@@ -215,6 +281,8 @@ class CommunityBuildingTransformer:
             社区边界文件路径
         buildings_file : str
             建筑物文件路径
+        stairwell_file : str, optional
+            楼梯间文件路径
             
         Returns:
         --------
@@ -227,30 +295,42 @@ class CommunityBuildingTransformer:
         boundary_gdf = self.load_community_boundary(boundary_file)
         buildings_gdf = self.load_buildings(buildings_file)
         
+        stairwell_gdf = None
+        if stairwell_file:
+            stairwell_gdf = self.load_stairwell(stairwell_file)
+        
         # 2. 检查坐标系
         print("\n2. 检查坐标系")
-        self.check_coordinate_systems(boundary_gdf, buildings_gdf)
+        self.check_coordinate_systems(boundary_gdf, buildings_gdf, stairwell_gdf)
         
         # 3. 转换为目标坐标系
         print("\n3. 转换为目标坐标系")
         transformed_boundary = self.transform_to_target_crs(boundary_gdf)
         transformed_buildings = self.transform_to_target_crs(buildings_gdf)
         
+        transformed_stairwell = None
+        if stairwell_gdf is not None:
+            transformed_stairwell = self.transform_to_target_crs(stairwell_gdf)
+        
         # 4. 设置原点为左下角
         print("\n4. 设置原点为左下角")
-        final_boundary, final_buildings, offset = self.set_origin_to_bottom_left(
-            transformed_boundary, transformed_buildings
+        final_boundary, final_buildings, final_stairwell, offset = self.set_origin_to_bottom_left(
+            transformed_boundary, transformed_buildings, transformed_stairwell
         )
         
         # 5. 显示结果信息
         print("\n5. 转换完成！")
         print(f"社区边界数量: {len(final_boundary)}")
         print(f"建筑物数量: {len(final_buildings)}")
+        if final_stairwell is not None:
+            print(f"楼梯间数量: {len(final_stairwell)}")
         print(f"新的社区边界框: {final_boundary.total_bounds}")
         print(f"新的建筑物边界框: {final_buildings.total_bounds}")
+        if final_stairwell is not None:
+            print(f"新的楼梯间边界框: {final_stairwell.total_bounds}")
         print(f"左下角坐标: ({final_boundary.total_bounds[0]:.2f}, {final_boundary.total_bounds[1]:.2f})")
         
-        return {
+        result = {
             'boundary_data': final_boundary,
             'buildings_data': final_buildings,
             'offset': offset,
@@ -258,6 +338,12 @@ class CommunityBuildingTransformer:
             'original_boundary_crs': str(boundary_gdf.crs),
             'original_buildings_crs': str(buildings_gdf.crs)
         }
+        
+        if final_stairwell is not None:
+            result['stairwell_data'] = final_stairwell
+            result['original_stairwell_crs'] = str(stairwell_gdf.crs)
+        
+        return result
     
     def save_transformed_data(self, result, output_dir='output'):
         """
@@ -293,6 +379,17 @@ class CommunityBuildingTransformer:
         result['buildings_data'].to_file(buildings_geojson, driver='GeoJSON')
         print(f"建筑物数据已保存到: {buildings_geojson}")
         
+        # 保存楼梯间（如果存在）
+        if 'stairwell_data' in result:
+            stairwell_output = os.path.join(output_dir, 'transformed_stairwell.shp')
+            result['stairwell_data'].to_file(stairwell_output)
+            print(f"楼梯间数据已保存到: {stairwell_output}")
+            
+            # 保存楼梯间为GeoJSON格式
+            stairwell_geojson = os.path.join(output_dir, 'transformed_stairwell.geojson')
+            result['stairwell_data'].to_file(stairwell_geojson, driver='GeoJSON')
+            print(f"楼梯间数据已保存到: {stairwell_geojson}")
+        
         # 保存转换信息
         info_output = os.path.join(output_dir, 'transformation_info.txt')
         with open(info_output, 'w', encoding='utf-8') as f:
@@ -300,12 +397,18 @@ class CommunityBuildingTransformer:
             f.write("=" * 50 + "\n")
             f.write(f"原始社区边界坐标系: {result['original_boundary_crs']}\n")
             f.write(f"原始建筑物坐标系: {result['original_buildings_crs']}\n")
+            if 'original_stairwell_crs' in result:
+                f.write(f"原始楼梯间坐标系: {result['original_stairwell_crs']}\n")
             f.write(f"目标坐标系: {result['target_crs']}\n")
             f.write(f"偏移量: {result['offset']}\n")
             f.write(f"社区边界数量: {len(result['boundary_data'])}\n")
             f.write(f"建筑物数量: {len(result['buildings_data'])}\n")
+            if 'stairwell_data' in result:
+                f.write(f"楼梯间数量: {len(result['stairwell_data'])}\n")
             f.write(f"新的社区边界框: {result['boundary_data'].total_bounds}\n")
             f.write(f"新的建筑物边界框: {result['buildings_data'].total_bounds}\n")
+            if 'stairwell_data' in result:
+                f.write(f"新的楼梯间边界框: {result['stairwell_data'].total_bounds}\n")
         
         print(f"转换信息已保存到: {info_output}")
 
@@ -327,7 +430,15 @@ def create_sample_data():
     ]
     buildings_gdf = gpd.GeoDataFrame(geometry=buildings, crs='EPSG:4326')
     
-    return boundary_gdf, buildings_gdf
+    # 创建示例楼梯间
+    stairwells = [
+        Polygon([(120, 120), (140, 120), (140, 140), (120, 140)]),
+        Polygon([(320, 170), (340, 170), (340, 190), (320, 190)]),
+        Polygon([(520, 320), (540, 320), (540, 340), (520, 340)])
+    ]
+    stairwell_gdf = gpd.GeoDataFrame(geometry=stairwells, crs='EPSG:4326')
+    
+    return boundary_gdf, buildings_gdf, stairwell_gdf
 
 def main():
     """主函数 - 演示使用方法"""
@@ -339,18 +450,20 @@ def main():
     
     # 创建示例数据
     print("创建示例数据...")
-    boundary_gdf, buildings_gdf = create_sample_data()
+    boundary_gdf, buildings_gdf, stairwell_gdf = create_sample_data()
     
     # 保存示例数据
     os.makedirs('sample_data', exist_ok=True)
     boundary_gdf.to_file('sample_data/sample_boundary.shp')
     buildings_gdf.to_file('sample_data/sample_buildings.shp')
+    stairwell_gdf.to_file('sample_data/sample_stairwell.geojson', driver='GeoJSON')
     print("示例数据已保存到 sample_data/ 目录")
     
     # 执行转换
     result = transformer.process_community_data(
         'sample_data/sample_boundary.shp',
-        'sample_data/sample_buildings.shp'
+        'sample_data/sample_buildings.shp',
+        'sample_data/sample_stairwell.geojson'
     )
     
     # 保存结果

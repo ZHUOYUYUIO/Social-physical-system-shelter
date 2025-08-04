@@ -1,0 +1,14 @@
+{
+"type": "FeatureCollection",
+"name": "transformed_stairwell",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3415" } },
+"features": [
+{ "type": "Feature", "properties": { }, "geometry": { "type": "Point", "coordinates": [ 324.84974670864176, 283.226331974146888 ] } },
+{ "type": "Feature", "properties": { }, "geometry": { "type": "Point", "coordinates": [ 320.312745755421929, 254.181307785911486 ] } },
+{ "type": "Feature", "properties": { }, "geometry": { "type": "Point", "coordinates": [ 365.917129922250751, 221.796429212903604 ] } },
+{ "type": "Feature", "properties": { }, "geometry": { "type": "Point", "coordinates": [ 260.671382795262616, 201.169289735844359 ] } },
+{ "type": "Feature", "properties": { }, "geometry": { "type": "Point", "coordinates": [ 313.818994071392808, 190.000654675997794 ] } },
+{ "type": "Feature", "properties": { }, "geometry": { "type": "Point", "coordinates": [ 194.946768993977457, 152.099332466023043 ] } },
+{ "type": "Feature", "properties": { }, "geometry": { "type": "Point", "coordinates": [ 179.52866825152887, 127.025097443023697 ] } }
+]
+}

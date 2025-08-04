@@ -34,6 +34,13 @@ student_agent.newVariableInt("point_id")
 student_agent.newVariableFloat("z")
 student_agent.newVariableFloat("drift", 0)
 
+stairwell_agent = model.newAgent("stairwell_agent")
+stairwell_agent.newVariableFloat("x")
+stairwell_agent.newVariableFloat("y")
+stairwell_agent.newVariableInt("stairwell_id")
+stairwell_agent.newVariableFloat("z")
+
+
 # Define environment properties
 env = model.Environment()
 env.newPropertyUInt("AGENT_COUNT", AGENT_COUNT)
@@ -150,7 +157,7 @@ if pyflamegpu.VISUALISATION:
     # Set the initial camera location and speed
     INIT_CAM = WIDTH / 2
     m_vis.setInitialCameraTarget(270, 205, 0)
-    m_vis.setInitialCameraLocation(400, 400, 100)
+    m_vis.setInitialCameraLocation(240, 100, 100)
     m_vis.setCameraSpeed(0.01)
     m_vis.setSimulationSpeed(25)
     # Add "point" agents to the visualisation
@@ -162,6 +169,10 @@ if pyflamegpu.VISUALISATION:
     student_agt.setModelScale(1/1.0);
     # Mark the environment bounds.
 
+    stairwell_agt = m_vis.addAgent("stairwell_agent")
+    stairwell_agt.setModel(pyflamegpu.ICOSPHERE);
+    stairwell_agt.setModelScale(1/0.5);
+    stairwell_agt.setColor(pyflamegpu.RED);
     
     pen = m_vis.newPolylineSketch(1, 1, 1, 0.2)
     pen.addVertex(157, 123, 0) #左下

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+
+This is a script for complete workflow used to generate data of ABM
+This script combine the functions including "coordinate system transformation" and "population generation"
 完整工作流程脚本
 整合坐标转换和散点生成功能
 """
@@ -12,8 +15,11 @@ from generate_population_points import PopulationPointGenerator
 from generate_flamegpu_code import generate_flamegpu_init_code
 import geopandas as gpd
 
+
+#DEfine what are needed for our function
 def run_complete_workflow(boundary_file='data/boundary.geojson', 
                          buildings_file='data/buildings.geojson',
+                         stairwells_file='data/stairwell.geojson',
                          base_population=50, 
                          variance=0.3):
     """
@@ -31,17 +37,21 @@ def run_complete_workflow(boundary_file='data/boundary.geojson',
         人口变化幅度
     """
     
-    print("=== 完整工作流程：坐标转换 + 散点生成 ===")
+    print("=== complete workflow. ch:完整工作流程：坐标转换 + 散点生成 ===")
     print("=" * 60)
     
     # 检查输入文件
     if not os.path.exists(boundary_file):
-        print(f"❌ 找不到社区边界文件: {boundary_file}")
+        print(f"❌ can not find the boundary_file; 找不到社区边界文件: {boundary_file}")
         return False
     
     if not os.path.exists(buildings_file):
-        print(f"❌ 找不到建筑物文件: {buildings_file}")
+        print(f"❌ can not find the builindings_file; 找不到建筑物文件: {buildings_file}")
         return False
+    
+    if not os.path.exists(stairwells_file):
+        print(f"❌ can not find the builindings_file; 找不到建筑物文件: {stairwells_file}")
+        return False    
     
     try:
         # 步骤1：坐标转换
@@ -49,7 +59,7 @@ def run_complete_workflow(boundary_file='data/boundary.geojson',
         print("-" * 30)
         
         transformer = CommunityBuildingTransformer(target_crs='EPSG:3415')
-        transform_result = transformer.process_community_data(boundary_file, buildings_file)
+        transform_result = transformer.process_community_data(boundary_file, buildings_file, stairwells_file)
         
         if not transform_result:
             print("❌ 坐标转换失败")
