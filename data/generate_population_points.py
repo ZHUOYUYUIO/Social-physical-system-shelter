@@ -19,6 +19,7 @@ import json
 import os
 import warnings
 warnings.filterwarnings('ignore')
+import yaml
 
 class PopulationPointGenerator:
     """人口散点生成器"""
@@ -645,7 +646,7 @@ def initialize_student_agent_population(studentAgentPopulation):
         except Exception as e:
             print(f"创建交互式可视化失败: {e}")
     
-    def process_data(self, base_population=50, variance=0.3):
+    def process_data(self, base_population, variance=0.3):
         """
         完整的数据处理流程
         
@@ -717,12 +718,18 @@ def main():
     print("建筑物内人口散点生成器")
     print("=" * 50)
     
+    # 读取配置参数
+    config_path = os.path.join(os.path.dirname(__file__), '../config/env.yaml')
+    if os.path.exists(config_path):
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config = yaml.safe_load(f)
+        base_population = config.get('base_population', 50) 
+    else:
+        base_population = 50
+    variance = 0.3  # 人口变化幅度
+    
     # 创建生成器
     generator = PopulationPointGenerator()
-    
-    # 设置参数
-    base_population = 50  # 每层基础人口数
-    variance = 0.3        # 人口变化幅度
     
     try:
         # 执行生成

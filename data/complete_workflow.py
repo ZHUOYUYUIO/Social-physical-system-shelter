@@ -14,6 +14,8 @@ from community_building_transformer import CommunityBuildingTransformer
 from generate_population_points import PopulationPointGenerator
 from generate_flamegpu_code import generate_flamegpu_init_code
 import geopandas as gpd
+import yaml
+
 
 
 #DEfine what are needed for our function
@@ -127,10 +129,21 @@ def main():
     print("功能：坐标转换 + 散点生成 + FlameGPU代码生成")
     print("=" * 60)
     
+
+    # 读取配置参数
+    config_path = os.path.join(os.path.dirname(__file__), '../config/env.yaml')
+    if os.path.exists(config_path):
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config = yaml.safe_load(f)
+        base_population = config.get('base_population', 50) 
+    else:
+        base_population = 50
+
+    variance = 0.3  # 人口变化幅度
     # 设置参数
     boundary_file = "data/boundary.geojson"
     buildings_file = "data/buildings.geojson"  # 包含楼层信息的建筑物文件
-    base_population = 50  # 每层基础人口数
+
     variance = 0.3        # 人口变化幅度
     
     print(f"输入文件：")
