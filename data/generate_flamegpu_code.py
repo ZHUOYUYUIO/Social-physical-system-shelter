@@ -99,7 +99,7 @@ def initialize_student_agent_population(model, cuda_model, population_file='data
             # 设置建筑物信息
             student_agent.setVariableInt("building_id", agent_data['building_id'])
             student_agent.setVariableInt("point_id", agent_data['point_id'])
-            student_agent.setVariableInt("floor", agent_data['floor'])
+            student_agent.setVariableFloat("z", agent_data['floor']*3.0)
         
         cuda_model.setPopulationData(studentAgentPopulation)
         print("学生代理种群初始化完成")
