@@ -6,10 +6,10 @@ import sys
 
 # Define some useful constants
 AGENT_COUNT = 16384
-ENV_WIDTH = int(AGENT_COUNT**(1/3))
+ENV_WIDTH = 10
 
 # Define the FLAME GPU model: 这个可以在后续的可视化窗口改名字
-model = pyflamegpu.ModelDescription("First test using default visualization")
+model = pyflamegpu.ModelDescription("Social_physical_shelter_Opt")
 
 # Define a message of type MessageSpatial2D named location
 # MessageSpatial2D: Each agent outputs a message at a specific location in 2D space
@@ -40,6 +40,7 @@ stairwell_agent.newVariableFloat("y")
 stairwell_agent.newVariableInt("stairwell_id")
 stairwell_agent.newVariableFloat("z")
 
+#如何用python版本，为不同类型的agents设置
 
 # Define environment properties
 env = model.Environment()
@@ -47,6 +48,7 @@ env.newPropertyUInt("AGENT_COUNT", AGENT_COUNT)
 env.newPropertyFloat("ENV_WIDTH", ENV_WIDTH)
 env.newPropertyFloat("repulse", 0.05)
 
+'''
 @pyflamegpu.agent_function
 def output_message(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageSpatial3D):
     message_out.setVariableUInt("id", pyflamegpu.getID())
@@ -97,10 +99,34 @@ def input_message(message_in: pyflamegpu.MessageSpatial3D, message_out: pyflameg
 
     pyflamegpu.setVariableFloat("drift", math.sqrtf(fx*fx + fy*fy + fz*fz))
     return pyflamegpu.ALIVE
+'''
+@pyflamegpu.agent_function
+def move(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageNone):
+    x=pyflamegpu.getVariableFloat("x")
+    y=pyflamegpu.getVariableFloat("y")
+    z=pyflamegpu.getVariableFloat("z")
+
+    
+    pyflamegpu.setVariableFloat("x", x+10)
+    pyflamegpu.setVariableFloat("y", y+10)
+    pyflamegpu.setVariableFloat("z", z+10)
+
+
+    return pyflamegpu.ALIVE
+ 
+
 
 # translate the agent functions from Python to C++
-output_func_translated = pyflamegpu.codegen.translate(output_message)
-input_func_translated = pyflamegpu.codegen.translate(input_message)
+#output_func_translated = pyflamegpu.codegen.translate(output_message)
+#input_func_translated = pyflamegpu.codegen.translate(input_message)
+
+move_func_translated= pyflamegpu.codegen.translate(move)
+move_fn = student_agent.newRTCFunction("move",move_func_translated)
+
+model.addExecutionRoot(move_fn)
+model.generateLayers()
+
+'''
 # Setup the two agent functions
 out_fn = student_agent.newRTCFunction("output_message", output_func_translated)
 out_fn.setMessageOutput("location")
@@ -109,6 +135,8 @@ in_fn.setMessageInput("location")
 
 # Message input depends on output
 in_fn.dependsOn(out_fn)
+'''
+
 
 # 添加学生代理类型
 # 基于data/output/flamegpu_init_code.py的学生代理初始化
@@ -116,8 +144,8 @@ in_fn.dependsOn(out_fn)
 
 # Dependency specification
 # Output is the root of our graph
-model.addExecutionRoot(out_fn)
-model.generateLayers()
+#model.addExecutionRoot(move)
+# model.generateLayers()
 
 
 # Create and init the simulation
@@ -146,16 +174,16 @@ cuda_model.initialise(sys.argv)
 
 
 # Attach the logging config
-cuda_model.setStepLog(step_log_cfg)
+cuda_model.setStepLog(step_log_cfg) 
 
-WIDTH=500
+
 
 # Only run this block if pyflamegpu was built with visualisation support
 if pyflamegpu.VISUALISATION:
     # Create visualisation
     m_vis = cuda_model.getVisualisation()
     # Set the initial camera location and speed
-    INIT_CAM = WIDTH / 2
+
     m_vis.setInitialCameraTarget(270, 205, 0)
     m_vis.setInitialCameraLocation(240, 100, 100)
     m_vis.setCameraSpeed(0.01)
@@ -173,7 +201,7 @@ if pyflamegpu.VISUALISATION:
     stairwell_agt.setModel(pyflamegpu.ICOSPHERE);
     stairwell_agt.setModelScale(1/0.5);
     stairwell_agt.setColor(pyflamegpu.RED);
-    
+     
     pen = m_vis.newPolylineSketch(1, 1, 1, 0.2)
     pen.addVertex(171.1506859746878, 502.3716148252133, 0) # 起始点
     pen.addVertex(105.09561226965161, 359.44766954286024, 0)
@@ -192,3 +220,6 @@ cuda_model.simulate()
 if pyflamegpu.VISUALISATION:
     # Keep the visualisation window active after the simulation has completed
     m_vis.join()
+
+
+# python src/test_3d_with_function.py -s 10 --out-step step.json

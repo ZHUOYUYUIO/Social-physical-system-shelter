@@ -9,7 +9,7 @@ AGENT_COUNT = 16384
 ENV_WIDTH = int(AGENT_COUNT**(1/3))
 
 # Define the FLAME GPU model: 这个可以在后续的可视化窗口改名字
-model = pyflamegpu.ModelDescription("First test using default visualization")
+model = pyflamegpu.ModelDescription("Social_physical_shelter_Opt")
 
 # Define a message of type MessageSpatial2D named location
 # MessageSpatial2D: Each agent outputs a message at a specific location in 2D space
@@ -18,8 +18,8 @@ model = pyflamegpu.ModelDescription("First test using default visualization")
 message = model.newMessageSpatial3D("location")
 # Configure the message list
 message.setMin(0, 0,0)
-message.setMax(ENV_WIDTH, ENV_WIDTH,ENV_WIDTH)
-message.setRadius(2)
+message.setMax(100, 100,100)
+message.setRadius(30)
 # Add extra variables to the message
 # X Y (Z) are implicit for spatial messages
 message.newVariableID("id")
