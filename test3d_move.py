@@ -3,7 +3,6 @@
 from pyflamegpu import *
 import pyflamegpu.codegen
 import sys
-import math
 
 # Define some useful constants
 AGENT_COUNT = 16384
@@ -25,12 +24,6 @@ message.setRadius(2)
 # X Y (Z) are implicit for spatial messages
 message.newVariableID("id")
 
-stairwell_message = model.newMessageSpatial3D("location_stairwell")
-stairwell_message.setMin(0, 0,0)
-stairwell_message.setMax(500, 500, 500)
-message.setRadius(200)
-stairwell_message.newVariableID("id")
-stairwell_message.newVariableFloat("class")
 
 # Assign the agent some variables (ID is implicit to agents, so we don't define it ourselves)
 student_agent = model.newAgent("student_agent")
@@ -40,12 +33,6 @@ student_agent.newVariableInt("building_id")
 student_agent.newVariableInt("point_id")
 student_agent.newVariableFloat("z")
 student_agent.newVariableFloat("drift", 0)
-#set the states for student agents
-student_agent.newState("not evacuate")
-student_agent.newState("focused")
-student_agent.newState("building evacuate")
-student_agent.newState("stairwell evacuate")
-student_agent.newState("neighborhood evacuate")
 
 stairwell_agent = model.newAgent("stairwell_agent")
 stairwell_agent.newVariableFloat("x")
@@ -120,43 +107,13 @@ def move(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageNone
     z=pyflamegpu.getVariableFloat("z")
 
     
-    pyflamegpu.setVariableFloat("x", x+1)
-    pyflamegpu.setVariableFloat("y", y+1)
-    pyflamegpu.setVariableFloat("z", z+1)
+    pyflamegpu.setVariableFloat("x", x+10)
+    pyflamegpu.setVariableFloat("y", y+10)
+    pyflamegpu.setVariableFloat("z", z+10)
 
 
     return pyflamegpu.ALIVE
-
-@pyflamegpu.agent_function
-def student_output_message(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageBruteForce):
-    message_out.setVariableUInt("id", pyflamegpu.getID())
-    message_out.setVariable
-    message_out.setLocation(
-        pyflamegpu.getVariableFloat("x"),
-        pyflamegpu.getVariableFloat("y"),
-        pyflamegpu.getVariableFloat("z")
-        )
-    return pyflamegpu.ALIVE
-
-
-
-#纯靠函数内判断距离：
-@pyflamegpu.agent_function
-def find_and_premove(message_in: pyflamegpu.MessageBruteForce, message_out: pyflamegpu.MessageNone):
-    rad = pyflamegpu.environment.getPropertyFloat("rad")
-    x1=pyflamegpu.getVariableFloat("x")
-    y1=pyflamegpu.getVariableFloat("y")
-    z1=pyflamegpu.getVariableFloat("z")
-
-    for message in pyflamegpu.message_in:
-        x2 = message.getVariableFloat("x")
-        y2 = message.getVariableFloat("y")        
-        z2 = message.getVariableFloat("z")  
-        x21 = x2 - x1
-        y21 = y2 - y1
-        z21 = z2 - z1
-        separation = math.sqrtf(x21*x21 + y21*y21 + z21*z21)
-        if separation < rad and separation > 0 :
+ 
 
 
 # translate the agent functions from Python to C++
@@ -166,23 +123,11 @@ def find_and_premove(message_in: pyflamegpu.MessageBruteForce, message_out: pyfl
 move_func_translated= pyflamegpu.codegen.translate(move)
 move_fn = student_agent.newRTCFunction("move",move_func_translated)
 
-move_s_fn = stairwell_agent.newRTCFunction("move",move_func_translated)
-
-move_s_fn.dependsOn(move_fn)
-
-
-#转换stairwell的输出函数并绑定到agent上
-stairwell_output_func_translated = pyflamegpu.codegen.translate(student_output_message)
-student_output_message_fn = stairwell_agent.newRTCFunction("student_output_message",stairwell_output_func_translated)
-#为stairwell输出函数绑定stairwell的专属消息类型
-student_output_message_fn.setMessageOutput("location_stairwell")
-
-
 model.addExecutionRoot(move_fn)
 model.generateLayers()
 
 '''
-# Setup the two agent functions这里可以设置嗷嗷
+# Setup the two agent functions
 out_fn = student_agent.newRTCFunction("output_message", output_func_translated)
 out_fn.setMessageOutput("location")
 in_fn = student_agent.newRTCFunction("input_message", input_func_translated)

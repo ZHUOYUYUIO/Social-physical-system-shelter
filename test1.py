@@ -53,7 +53,7 @@ def input_message(message_in: pyflamegpu.MessageSpatial2D, message_out: pyflameg
     for message in message_in(x1, y1):
         if message.getVariableUInt("id") != ID :
             x2 = message.getVariableFloat("x")
-            y2 = message.getVariableFloat("y")
+            y2 = message.getVariableFloat("y") 
             x21 = x2 - x1
             y21 = y2 - y1
             separation = math.sqrtf(x21*x21 + y21*y21)
