@@ -128,7 +128,7 @@ def move(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageNone
     return pyflamegpu.ALIVE
 
 @pyflamegpu.agent_function
-def student_output_message(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageBruteForce):
+def student_output_message(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageArray3D):
     message_out.setVariableUInt("id", pyflamegpu.getID())
     message_out.setVariable
     message_out.setLocation(
@@ -142,7 +142,7 @@ def student_output_message(message_in: pyflamegpu.MessageNone, message_out: pyfl
 
 #纯靠函数内判断距离：
 @pyflamegpu.agent_function
-def find_and_premove(message_in: pyflamegpu.MessageBruteForce, message_out: pyflamegpu.MessageNone):
+def find_and_premove(message_in: pyflamegpu.MessageArray3D, message_out: pyflamegpu.MessageNone):
     rad = pyflamegpu.environment.getPropertyFloat("rad")
     x1=pyflamegpu.getVariableFloat("x")
     y1=pyflamegpu.getVariableFloat("y")
@@ -157,6 +157,33 @@ def find_and_premove(message_in: pyflamegpu.MessageBruteForce, message_out: pyfl
         z21 = z2 - z1
         separation = math.sqrtf(x21*x21 + y21*y21 + z21*z21)
         if separation < rad and separation > 0 :
+
+
+######
+## AGENT STATES SHIFT AND AGENT MOVE
+######
+
+#STUDENT AGENT: FOCUSED --> BUILDING EVACUATE
+
+def student_agent_move_F_to_BE(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageNone):
+    #这里要获取周围有多少BE的agents:具体做法是：获取message的信息，根据message的状态？现在的问题是如何获取agent的状态并放进message里面。
+    
+
+
+#STUDENT AGENT: NOT EVACUATE --> BUILDING EVACUATE
+
+def student_agent_move_NE_to_BE(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageNone):
+
+#STUDENT AGENT: BUILDING EVACUATE --> STAIRWELL EVACUATE
+@pyflamegpu.agent_function
+def student_agent_move_BE_to_SE(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageNone):
+    #这里我需要为agent添加一个变量：target_stairwell。最好是list那种，我直接获取这个点的坐标，现在简单一点，我就用直线距离？
+    #有一个大问题：就是，碰到墙壁了该怎么办？还有行人之间的拥堵怎么设置啊。飞鸟模型？？
+ 
+ #condition for transition from BE to SE
+@pyflamegpu.agent_function_condition
+def BE_to_SE_DISTANCE() -> bool:
+    return pyflamegpu.getVariableInt("distance") <= 0
 
 
 # translate the agent functions from Python to C++
