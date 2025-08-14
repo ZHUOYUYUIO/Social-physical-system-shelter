@@ -26,7 +26,7 @@ agent.newVariableFloat("x")
 agent.newVariableFloat("y")
 agent.newVariableFloat("drift", 0)
 
-# Define environment properties
+# Define environment properties 
 env = model.Environment()
 env.newPropertyUInt("AGENT_COUNT", AGENT_COUNT)
 env.newPropertyFloat("ENV_WIDTH", ENV_WIDTH)
