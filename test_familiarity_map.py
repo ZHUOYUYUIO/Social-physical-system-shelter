@@ -12,19 +12,19 @@ class write_env_hostfn(pyflamegpu.HostFunction):
   def run(self,FLAMEGPU):
 
       # Retrieve the environment macro property bar of type int array[5][5]
-      bar = FLAMEGPU.environment.getMacroPropertyInt("map");
+
       # Update some of the values
       # foo = 12.0; is not allowed
+      FLAMEGPU.environment.importMacroProperty("map", "attraction_matrix.json");
 
-      bar[0][0] = 1;
-      bar[0][1] = 5;
+      FLAMEGPU.environment.exportMacroProperty("map", "out1.json");
 
     # Python does not allow the increment operator to be overridden
 
 model = pyflamegpu.ModelDescription("F_MAP_tutorial")
 
 env = model.Environment()
-env.newMacroPropertyInt("map", 5, 5)
+env.newMacroPropertyInt("map", 100, 80)
 
 
 # Define an agent named point
@@ -34,21 +34,21 @@ agent.newVariableFloat("x")
 agent.newVariableFloat("y")
 agent.newVariableFloat("test_value")
 agent.newVariableFloat("drift", 0)
-
+ 
 @pyflamegpu.agent_function
 def map_get(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageNone):
    x1 = pyflamegpu.getVariableFloat("x")
    y1 = pyflamegpu.getVariableFloat("y")
 
    #获取我们env里的map值
-   map = pyflamegpu.environment.getMacroPropertyInt("map", 5,5)
-   map_point = map[0][1]
+   map = pyflamegpu.environment.getMacroPropertyInt("map", 100,80)
+   map_point = map[50][60] 
 
 
    dis_x = x1-0
    dis_y = y1-1
    separation = math.sqrtf(dis_x*dis_x + dis_y*dis_y)
-   test_value = map_point/separation
+   test_value = map_point/1
    pyflamegpu.setVariableFloat("test_value", test_value)
    return pyflamegpu.ALIVE
    
@@ -93,3 +93,6 @@ out_pop = pyflamegpu.AgentVector(model.Agent("point"))
 cuda_model.getPopulationData(out_pop)
 for agent in out_pop:
     print("value: %f"%(agent.getVariableFloat("test_value")))
+
+
+# python test_familiarity_map.py -s 10
