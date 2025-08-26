@@ -10,21 +10,16 @@ class write_env_hostfn(pyflamegpu.HostFunction):
     super().__init__()  
   
   def run(self,FLAMEGPU):
+    FLAMEGPU.environment.importMacroProperty("map_3d", "obstacle1.json");
 
-      # Retrieve the environment macro property bar of type int array[5][5]
-
-      # Update some of the values
-      # foo = 12.0; is not allowed
-      FLAMEGPU.environment.importMacroProperty("map", "attraction_matrix.json");
-
-      FLAMEGPU.environment.exportMacroProperty("map", "out1.json");
 
     # Python does not allow the increment operator to be overridden
 
 model = pyflamegpu.ModelDescription("F_MAP_tutorial")
 
+
 env = model.Environment()
-env.newMacroPropertyInt("map", 100, 80)
+env.newMacroPropertyInt("obstacle1", 4, 2)  
 
 
 
@@ -34,6 +29,7 @@ agent = model.newAgent("point")
 agent.newVariableFloat("x")
 agent.newVariableFloat("y")
 agent.newVariableFloat("test_value")
+agent.newVariableFloat("test_value1")
 agent.newVariableFloat("drift", 0)
 
 def mult(a,b):
@@ -47,25 +43,30 @@ def mult(a: float, b: float) -> float :
 def dist(x: float, y: float) -> float:
   return math.sqrtf(x*x+y*y)
 
+@pyflamegpu.device_function
+def min(a: float, b: float) -> float:
+  return a if a < b else b
 
+@pyflamegpu.device_function
+def max(a: float, b: float) -> float:
+  return a if a > b else b
 
 
 @pyflamegpu.agent_function
 def map_get(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageNone):
-   x1 = pyflamegpu.getVariableFloat("x")
-   y1 = pyflamegpu.getVariableFloat("y")
-
-   #获取我们env里的map值
-   map = pyflamegpu.environment.getMacroPropertyInt("map", 100,80)
-   map_point = map[50][60] 
 
 
-   dis_x = x1-0
-   dis_y = y1-1
-   separation = dist(dis_x, dis_y)
-   test_value = map_point/separation + mult(dis_x, dis_y)
-   pyflamegpu.setVariableFloat("test_value", test_value)
-   return pyflamegpu.ALIVE
+    obstacle1 = pyflamegpu.environment.getMacroPropertyInt("obstacle1", 4, 2)
+
+    inside = 0
+    a=obstacle1[3][1]
+
+
+
+
+    pyflamegpu.setVariableFloat("test_value", inside)
+    pyflamegpu.setVariableFloat("test_value1", a)
+    return pyflamegpu.ALIVE
    
 map_get_translated = pyflamegpu.codegen.translate(map_get)
 map_get_fn = agent.newRTCFunction("map_get",map_get_translated)
@@ -107,7 +108,7 @@ cuda_model.simulate()
 out_pop = pyflamegpu.AgentVector(model.Agent("point"))
 cuda_model.getPopulationData(out_pop)
 for agent in out_pop:
-    print("value: %f"%(agent.getVariableFloat("test_value")))
+    print("value: %f"%(agent.getVariableFloat("test_value1")))
 
 
 # python test_familiarity_map.py -s 10
