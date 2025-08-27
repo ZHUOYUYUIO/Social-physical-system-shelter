@@ -20,7 +20,6 @@ env = model.Environment()
 env.newMacroPropertyInt("map_3d", 3, 20,2)  
 
 
-
 # Define an agent named point
 agent = model.newAgent("point")
 # Assign the agent some variables (ID is implicit to agents, so we don't define it ourselves)
@@ -31,8 +30,11 @@ agent.newVariableFloat("test_value1")
 agent.newVariableFloat("drift", 0)
 agent.newVariableInt("building_index",0)
 agent.newVariableInt("in_building",0)
-agent.newVariableInt("on_boundary",0) 
 agent.newVariableInt("pushed_out",0)
+agent.newVariableFloat("exit_x",0)
+agent.newVariableFloat("exit_y",0)
+agent.newVariableInt("can_go_direct",0)
+
 
 def mult(a,b):
   return a*b
@@ -84,40 +86,40 @@ def map_get(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageN
     y = pyflamegpu.getVariableFloat("y")
     
     in_any_building = 0
-    on_boundary = 0
     building_index = -1
     
     for building_idx in range(3):
         intersect_count = 0
-        prev_x = map_3d[building_idx][19][0]
-        prev_y = map_3d[building_idx][19][1]
         
-        for point_idx in range(20):
+        # 找到当前建筑物的最后一个有效点索引
+        last_valid_idx = 0
+        for i in range(20):
+            if map_3d[building_idx][i][0] == 0 and map_3d[building_idx][i][1] == 0:
+                last_valid_idx = i - 1
+                break
+            last_valid_idx = i  # 如果所有点都有效
+        
+        # 如果没有有效点，跳过这个建筑物
+        if last_valid_idx < 0:
+            continue
+        
+        # 设置第一个点为最后一个有效点（形成闭合多边形）
+        prev_x = map_3d[building_idx][last_valid_idx][0]
+        prev_y = map_3d[building_idx][last_valid_idx][1]
+        
+        for point_idx in range(last_valid_idx + 1):  # 只遍历有效点
             curr_x = map_3d[building_idx][point_idx][0]
             curr_y = map_3d[building_idx][point_idx][1]
             
-
-            if curr_x == 0 and curr_y == 0:
-                break
+            # 检查点是否在边界上
             
-
-            if (min(prev_x, curr_x) <= x <= max(prev_x, curr_x) and 
-                min(prev_y, curr_y) <= y <= max(prev_y, curr_y)):
-
-                if abs((curr_y - prev_y) * x - (curr_x - prev_x) * y + curr_x * prev_y - curr_y * prev_x) < 1e-6:
-                    on_boundary = 1
-
-                    break
-            
-            # ray
-            if ((prev_y > y) != (curr_y > y)) and (x < (curr_x - prev_x) * (y - prev_y) / (curr_y - prev_y + 1e-10) + prev_x):
+            # 射线法判断交点
+            if ((prev_y > y) != (curr_y > y)) and \
+               (x < (curr_x - prev_x) * (y - prev_y) / (curr_y - prev_y + 1e-10) + prev_x):
                 intersect_count += 1
             
             prev_x = curr_x
             prev_y = curr_y
-        
-        if on_boundary == 1:
-            break
         
         if intersect_count % 2 == 1:
             in_any_building = 1
@@ -125,7 +127,6 @@ def map_get(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageN
             break
     
     pyflamegpu.setVariableInt("in_building", in_any_building)
-    pyflamegpu.setVariableInt("on_boundary", on_boundary)
     pyflamegpu.setVariableInt("building_index", building_index)
     
     return pyflamegpu.ALIVE
@@ -208,13 +209,18 @@ def push_start_out_of_obstacle(message_in: pyflamegpu.MessageNone, message_out: 
         push_dx = 1.0
         push_dy = 0.0
     
+    m= math.sqrtf(push_dx*push_dx+push_dy*push_dy)
+    ddx=push_dx/m*0.1
+    ddy=push_dy/m*0.1
+
+
     # 向外移动
-    new_x = exit_x + push_dx
-    new_y = exit_y + push_dy
+    new_x = exit_x + ddx
+    new_y = exit_y + ddy
     
     drift = new_x - start_x
-    pyflamegpu.setVariableFloat("x", new_x)
-    pyflamegpu.setVariableFloat("y", new_y)
+    pyflamegpu.setVariableFloat("exit_x", new_x)
+    pyflamegpu.setVariableFloat("exit_y", new_y)
     pyflamegpu.setVariableInt("pushed_out", 1)
     pyflamegpu.setVariableFloat("drift", drift)
     
@@ -223,6 +229,73 @@ def push_start_out_of_obstacle(message_in: pyflamegpu.MessageNone, message_out: 
 ###
 #这里需要注意后面线段与几何体的边是否相交，来判断。
 ##
+@pyflamegpu.agent_function
+def can_go_direct(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageNone):
+    x = pyflamegpu.getVariableFloat("exit_x")
+    y = pyflamegpu.getVariableFloat("exit_y")
+    map_3d = pyflamegpu.environment.getMacroPropertyInt("map_3d", 3, 20, 2)
+    shelter_x = 1.0
+    shelter_y = 9.0
+    
+    # 初始化结果为可以直接到达
+    can_go = 1
+    
+    # 遍历所有建筑物
+    for building_idx in range(3):
+        # 找到当前建筑物的最后一个有效点索引
+        last_valid_idx = -1
+        for i in range(20):
+            if map_3d[building_idx][i][0] == 0 and map_3d[building_idx][i][1] == 0:
+                last_valid_idx = i - 1
+                break
+            last_valid_idx = i  # 如果所有点都有效
+        
+        # 如果没有有效点，跳过这个建筑物
+        if last_valid_idx < 1:  # 至少需要2个点才能形成边
+            continue
+        
+        # 遍历建筑物的所有边
+        for i in range(last_valid_idx + 1):
+            # 获取当前边的两个端点
+            x1=map_3d[building_idx][i][0]
+            y1=map_3d[building_idx][i][1]
+            # 获取下一个端点（如果是最后一个点，则连接到第一个点形成闭合多边形）
+            next_idx = (i + 1) % (last_valid_idx + 1)
+            x2=map_3d[building_idx][next_idx][0]
+            y2=map_3d[building_idx][next_idx][1]
+            
+            # 检查从当前位置(x,y)到避难所(shelter_x, shelter_y)的线段是否与当前边相交
+            # 线段1: (x,y) -> (shelter_x, shelter_y)
+            # 线段2: (x1,y1) -> (x2,y2)
+            
+            # 计算分母（叉积）
+            denom = (x - shelter_x) * (y1 - y2) - (y - shelter_y) * (x1 - x2)
+            
+            # 如果平行或共线，跳过
+            if abs(denom) < 1e-10:
+                continue
+            
+            # 计算参数t和u
+            t = ((x - x1) * (y1 - y2) - (y - y1) * (x1 - x2)) / denom
+            u = -((x - shelter_x) * (y - y1) - (y - shelter_y) * (x - x1)) / denom
+            
+            # 检查交点是否在线段范围内
+            if 0 < t < 1:
+                if 0 < u < 1:
+                    can_go = -1  # 有交点，不能直接到达
+                    break  # 跳出内层循环
+        
+        # 如果已经发现有相交，提前终止所有建筑物的遍历
+        if  can_go == -1:
+            break
+    
+    # 设置结果变量
+    pyflamegpu.setVariableInt("can_go_direct", can_go)
+    
+    # 可选：如果需要输出其他信息
+    
+    return pyflamegpu.ALIVE
+
 
 map_get_translated = pyflamegpu.codegen.translate(map_get)
 map_get_fn = agent.newRTCFunction("map_get",map_get_translated)
@@ -230,9 +303,13 @@ map_get_fn = agent.newRTCFunction("map_get",map_get_translated)
 push_start_out_of_obstacle_translated = pyflamegpu.codegen.translate(push_start_out_of_obstacle)
 push_start_out_of_obstacle_fn = agent.newRTCFunction("push_start_out_of_obstacle",push_start_out_of_obstacle_translated)
 
+can_go_direct_translated = pyflamegpu.codegen.translate(can_go_direct)
+can_go_direct_fn = agent.newRTCFunction("can_go_direct",can_go_direct_translated)
+
 model.addInitFunction(write_env_hostfn())
 model.addExecutionRoot(map_get_fn)
 push_start_out_of_obstacle_fn.dependsOn(map_get_fn)
+can_go_direct_fn.dependsOn(push_start_out_of_obstacle_fn)
 model.generateLayers()
 
 # Specify the desired StepLoggingConfig
@@ -252,8 +329,8 @@ ENV_WIDTH=10
 AgentPopulation = pyflamegpu.AgentVector(model.Agent("point"), AGENT_COUNT)
 for i in range(AGENT_COUNT):
     agent = AgentPopulation[i]
-    agent.setVariableFloat("x", 7)
-    agent.setVariableFloat("y", 2)
+    agent.setVariableFloat("x", 0.5)
+    agent.setVariableFloat("y", 1)
 
 cuda_model.setPopulationData(AgentPopulation)
 
@@ -316,12 +393,15 @@ out_pop = pyflamegpu.AgentVector(model.Agent("point"))
 cuda_model.getPopulationData(out_pop)
 for agent in out_pop:
     print("value: %f"%(agent.getVariableInt("in_building")))
-    print("value: %f"%(agent.getVariableInt("on_boundary")))
+    #print("value: %f"%(agent.getVariableInt("on_boundary")))
     print("value: %f"%(agent.getVariableInt("building_index")))
     print("value: %f"%(agent.getVariableInt("pushed_out")))
     print("value: %f"%(agent.getVariableFloat("drift")))
     print("value: %f"%(agent.getVariableFloat("x")))
     print("value: %f"%(agent.getVariableFloat("y")))
+    print("value: %f"%(agent.getVariableFloat("exit_x")))
+    print("value: %f"%(agent.getVariableFloat("exit_y")))
+    print("value: %f"%(agent.getVariableInt("can_go_direct")))
     print("=======")
 
 if pyflamegpu.VISUALISATION:
