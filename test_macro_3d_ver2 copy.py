@@ -230,61 +230,65 @@ def push_start_out_of_obstacle(message_in: pyflamegpu.MessageNone, message_out: 
 ##
 @pyflamegpu.agent_function
 def can_go_direct(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageNone):
-    x = pyflamegpu.getVariableFloat("x")  # 当前x坐标
-    y = pyflamegpu.getVariableFloat("y")  # 当前y坐标
-    exit_x = pyflamegpu.getVariableFloat("exit_x")  # 出口x坐标
-    exit_y = pyflamegpu.getVariableFloat("exit_y")  # 出口y坐标
-    
-    # 正确获取3D数组 - 假设map_3d是环境变量
-    # 如果map_3d是agent变量或其他类型，需要相应调整
-    map_3d = pyflamegpu.model.getEnvironment().getPropertyInt("map_3d")
-    # 或者如果是宏属性：
-    # map_3d = pyflamegpu.environment.getMacroPropertyInt("map_3d")
+    x = pyflamegpu.getVariableFloat("x")
+    y = pyflamegpu.getVariableFloat("y")
+    map_3d = pyflamegpu.environment.getMacroPropertyInt("map_3d", 3, 20, 2)
+    shelter_x = 1.0
+    shelter_y = 9.0
     
     # 初始化结果为可以直接到达
     can_go = 1
     
-    # 遍历所有建筑物（假设有3个建筑物）
+    # 遍历所有建筑物
     for building_idx in range(3):
+        # 找到当前建筑物的最后一个有效点索引
+        last_valid_idx = -1
+        for i in range(20):
+            if map_3d[building_idx][i][0] == 0 and map_3d[building_idx][i][1] == 0:
+                last_valid_idx = i - 1
+                break
+            last_valid_idx = i  # 如果所有点都有效
+        
+        # 如果没有有效点，跳过这个建筑物
+        if last_valid_idx < 1:  # 至少需要2个点才能形成边
+            continue
+        
         # 遍历建筑物的所有边
-        for i in range(19):  # 假设最多20个点，但索引到18
+        for i in range(last_valid_idx + 1):
             # 获取当前边的两个端点
-            x1 = map_3d[building_idx][i][0]
-            y1 = map_3d[building_idx][i][1]
-            x2 = map_3d[building_idx][i + 1][0]
-            y2 = map_3d[building_idx][i + 1][1]
+            x1 = float(map_3d[building_idx][i][0])
+            y1 = float(map_3d[building_idx][i][1])
+            # 获取下一个端点（如果是最后一个点，则连接到第一个点形成闭合多边形）
+            next_idx = (i + 1) % (last_valid_idx + 1)
+            x2 = float(map_3d[building_idx][next_idx][0])
+            y2 = float(map_3d[building_idx][next_idx][1])
             
-            # 检查端点是否为无效点（0,0表示结束）
-            if (x1 == 0 and y1 == 0) or (x2 == 0 and y2 == 0):
-                continue
-            
-            # 使用正确的线段相交检测算法
-            # 线段1: (x,y) -> (exit_x, exit_y)
+            # 使用线段相交算法判断路径是否被阻挡
+            # 线段1: (x,y) -> (shelter_x, shelter_y)
             # 线段2: (x1,y1) -> (x2,y2)
             
-            # 计算分母
-            denom = (exit_x - x) * (y1 - y2) - (exit_y - y) * (x1 - x2)
-            
-            # 如果平行或共线，跳过
-            if abs(denom) < 1e-10:
-                continue
-            
-            # 计算参数t和u
-            t = ((x1 - x) * (y1 - y2) - (y1 - y) * (x1 - x2)) / denom
-            u = ((x1 - x) * (exit_y - y) - (y1 - y) * (exit_x - x)) / denom
-            
-            # 检查交点是否在线段范围内
-            if 0 <= t <= 1 and 0 <= u <= 1:
-                can_go = -1  # 有交点，不能直接到达
-                break  # 跳出内层循环
+            # 第一步：MBR快速排斥实验
+            if max(x, shelter_x) >= min(x1, x2) and \
+               max(x1, x2) >= min(x, shelter_x) and \
+               max(y, shelter_y) >= min(y1, y2) and \
+               max(y1, y2) >= min(y, shelter_y):
+                
+                # 第二步：跨立实验
+                # 计算向量叉积
+                cross1 = (shelter_x - x) * (y1 - y) - (x1 - x) * (shelter_y - y)
+                cross2 = (shelter_x - x) * (y2 - y) - (x2 - x) * (shelter_y - y)
+                cross3 = (x2 - x1) * (y - y1) - (x - x1) * (y2 - y1)
+                cross4 = (x2 - x1) * (shelter_y - y1) - (shelter_x - x1) * (y2 - y1)
+                
+                # 如果两条线段相交，则不能直接到达
+                if cross1 * cross2 <= 0 and cross3 * cross4 <= 0:
+                    can_go = 0
+                    break  # 只要有一个阻挡就退出内层循环
         
-        # 如果已经发现有相交，提前终止所有建筑物的遍历
-        if can_go == -1:
-            break
+        if can_go == 0:
+            break  # 退出外层循环
     
-    # 设置结果变量
     pyflamegpu.setVariableInt("can_go_direct", can_go)
-    
     return pyflamegpu.ALIVE
 
 
@@ -320,8 +324,8 @@ ENV_WIDTH=10
 AgentPopulation = pyflamegpu.AgentVector(model.Agent("point"), AGENT_COUNT)
 for i in range(AGENT_COUNT):
     agent = AgentPopulation[i]
-    agent.setVariableFloat("x", 1)
-    agent.setVariableFloat("y", 9)
+    agent.setVariableFloat("x", 1.0)
+    agent.setVariableFloat("y", 7.1)
 
 cuda_model.setPopulationData(AgentPopulation)
 
