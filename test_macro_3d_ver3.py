@@ -291,6 +291,15 @@ def can_go_direct(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.Me
     pyflamegpu.setVariableInt("can_go_direct", can_go)
     return pyflamegpu.ALIVE
 
+#####
+# 关于可见图算法，我也有一个思路了，那就是先把建筑障碍物的点变成网络，在将agent的点变成网络
+#####
+#我还要做什么？
+## 另外写一个脚本，将建筑物障碍物的边界进行扩张延申，再多增添一些节点，这样可能更好。
+## 让ai把这个生成的点变成我们pyflamegpu的网络environment
+## 再写一个agent的pyflamegpu的函数，用以贪心算法。再存储我们agent的路线
+## 但是还是存在小问题啊，因为可能连到非最近的点，可能全路径会更短！或者说连接最近的几个点？？？
+
 
 map_get_translated = pyflamegpu.codegen.translate(map_get)
 map_get_fn = agent.newRTCFunction("map_get",map_get_translated)
