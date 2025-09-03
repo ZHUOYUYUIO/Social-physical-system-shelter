@@ -29,7 +29,16 @@ agent.newVariableFloat("bar_0_0")
 agent.newVariableInt("start_vertex_id")
 agent.newVariableInt("end_vertex_id")
 agent.newVariableInt("path_length")
-agent.newVariableArrayInt("shortest_path", 100)  # 存储最短路径的顶点ID数组
+agent.newVariableArrayInt("shortest_path", 20)  # 存储最短路径的顶点ID数组，16个顶点的图最长路径不超过20
+
+agent.newVariableArrayFloat("shortest_value",16, [-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0])
+
+# Dijkstra算法需要的变量
+agent.newVariableArrayFloat("distances", 16, [999999.0] * 16)  # 距离数组，初始化为无穷大
+agent.newVariableArrayInt("visited", 16, [0] * 16)  # 访问标记数组
+agent.newVariableArrayInt("previous", 16, [-1] * 16)  # 前驱节点数组
+agent.newVariableInt("vertex_count")  # 顶点数量
+agent.newVariableInt("edge_count")  # 边数量
 
 
 
@@ -89,26 +98,53 @@ def ShortestPathFn(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.M
     """
     fgraph = pyflamegpu.environment.getDirectedGraph("fgraph")
 
+    # 定义常量
+    INF = 999999.0
+    vertex_count = 16  # 假设图中有16个顶点
+
     # 获取起点和终点ID（可以从agent变量中获取，或者设置为固定值）
     start_vertex_id = pyflamegpu.getVariableInt("start_vertex_id")
     end_vertex_id = pyflamegpu.getVariableInt("end_vertex_id")
 
-    # 获取图的顶点数量
-    vertex_count = fgraph.getVertexCount()
-    edge_count = fgraph.getEdgeCount()
+    ###
+    # 起点是哪个，我们就把它的list对应的i，设置为0。
+    ###
+    pyflamegpu.setVariableFloatArray16("shortest_value", start_vertex_id, 0)
 
-    # 初始化距离数组（使用一个大的常数表示无穷大）
-    INF = 999999.0
-    distances = [INF] * vertex_count
-    previous = [-1] * vertex_count
-    visited = [False] * vertex_count
+    #然后遍历所有顶点（1-16），除了我们的起点id外，如果它和起点id有连线，我们就把它的list对应的i，设置为起点到它的距离。
+
+    #遍历起点的id，线的值就设置为shortest_value的起点对应的i的值+边的值。
+    # 先初始化所有顶点的shortest_value为INF
+    for i in range(1, 16):
+        if i != start_vertex_id:
+            pyflamegpu.setVariableFloatArray16("shortest_value", i, INF)
+
+    # 遍历起点连接的边，设置对应的shortest_value
+    for edge in fgraph.outEdges(start_vertex_id-1):
+        # 获取边的目的顶点索引
+        dest_vertex_index = edge.getEdgeDestination()
+        # 获取边的foo属性
+        foo = edge.getPropertyInt("foo")
+
+        # 将foo值存储到对应顶点ID的位置
+        pyflamegpu.setVariableFloatArray16("shortest_value", dest_vertex_index, foo)
+            
+
 
     # 获取起点和终点的索引
     start_index = fgraph.getVertexIndex(start_vertex_id)
     end_index = fgraph.getVertexIndex(end_vertex_id)
 
-    # 初始化起点
-    distances[start_index] = 0.0
+    # 初始化起点距离为0
+    pyflamegpu.setVariableFloatArray16("distances", start_index, 0.0)
+    # 初始化起点前驱为-1
+    pyflamegpu.setVariableIntArray16("previous", start_index, -1)
+    # 初始化其他顶点的距离为无穷大，前驱为-1
+    for i in range(vertex_count):
+        if i != start_index:
+            pyflamegpu.setVariableFloatArray16("distances", i, INF)
+            pyflamegpu.setVariableIntArray16("previous", i, -1)
+        pyflamegpu.setVariableIntArray16("visited", i, 0)
 
     # Dijkstra算法主循环
     for _ in range(vertex_count):
@@ -117,14 +153,17 @@ def ShortestPathFn(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.M
         current_index = -1
 
         for i in range(vertex_count):
-            if not visited[i] and distances[i] < min_distance:
-                min_distance = distances[i]
+            visited_i = pyflamegpu.getVariableIntArray16("visited", i)
+            distance_i = pyflamegpu.getVariableFloatArray16("distances", i)
+            if visited_i == 0 and distance_i < min_distance:
+                min_distance = distance_i
                 current_index = i
 
-        if current_index == -1 or distances[current_index] == INF:
+        if current_index == -1 or min_distance == INF:
             break
 
-        visited[current_index] = True
+        # 标记当前顶点为已访问
+        pyflamegpu.setVariableIntArray16("visited", current_index, 1)
 
         # 如果到达终点，可以提前结束
         if current_index == end_index:
@@ -134,43 +173,69 @@ def ShortestPathFn(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.M
         current_vertex_id = fgraph.getVertexID(current_index)
 
         # 遍历当前顶点的所有出边
-        for edge_index in range(edge_count):
-            source_id = fgraph.getEdgeSource(edge_index)
-            if source_id == current_vertex_id:
-                dest_id = fgraph.getEdgeDestination(edge_index)
-                dest_index = fgraph.getVertexIndex(dest_id)
+        for edge in fgraph.outEdges(current_index):
+            source_index = fgraph.getEdgeSource()
+            if source_index == current_index:
+                dest_index = fgraph.getEdgeDestination()
 
-                if not visited[dest_index]:
+                visited_dest = pyflamegpu.getVariableIntArray16("visited", dest_index)
+                if visited_dest == 0:
                     # 获取边的权重
-                    edge_weight = fgraph.getEdgePropertyFloat("foo", edge_index)
-                    new_distance = distances[current_index] + edge_weight
+                    edge_weight = edge.getPropertyFloat("foo")
+                    current_distance = pyflamegpu.getVariableFloatArray16("distances", current_index)
+                    new_distance = current_distance + edge_weight
 
-                    if new_distance < distances[dest_index]:
-                        distances[dest_index] = new_distance
-                        previous[dest_index] = current_index
+                    dest_distance = pyflamegpu.getVariableFloatArray16("distances", dest_index)
+                    if new_distance < dest_distance:
+                        pyflamegpu.setVariableFloatArray16("distances", dest_index, new_distance)
+                        pyflamegpu.setVariableIntArray16("previous", dest_index, current_index)
 
-    # 重建最短路径
-    path = []
-    current = end_index
+    # 重建最短路径 - 使用pyflamegpu方法完全避免循环和索引操作
 
-    while current != -1:
-        vertex_id = fgraph.getVertexID(current)
-        path.append(vertex_id)
-        current = previous[current]
+    # 初始化路径数组为-1（手动设置每个元素）
+    pyflamegpu.setVariableIntArray20("shortest_path", 0, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 1, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 2, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 3, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 4, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 5, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 6, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 7, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 8, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 9, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 10, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 11, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 12, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 13, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 14, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 15, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 16, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 17, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 18, -1)
+    pyflamegpu.setVariableIntArray20("shortest_path", 19, -1)
+   
+    # 从终点开始重建路径（展开循环，避免使用for循环）
+    current_0 = end_index
+    if current_0 != -1:
+        vertex_id_0 = fgraph.getVertexID(current_0)
+        pyflamegpu.setVariableIntArray100("shortest_path", 0, vertex_id_0)
+        prev_0 = pyflamegpu.getVariableIntArray16("previous", current_0)
 
-    path.reverse()
-
-    # 如果路径存在（起点和终点连通），则存储路径信息
-    if len(path) > 1 and path[0] == start_vertex_id:
-        # 存储路径长度
-        pyflamegpu.setVariableInt("path_length", len(path))
-
-        # 存储路径中的顶点ID
-        shortest_path_array = pyflamegpu.getVariableArrayInt("shortest_path")
-        for i in range(min(len(path), 100)):  # 限制路径长度不超过数组大小
-            shortest_path_array[i] = path[i]
+        if prev_0 != -1:
+            vertex_id_1 = fgraph.getVertexID(prev_0)
+            pyflamegpu.setVariableIntArray100("shortest_path", 1, vertex_id_1)
+            # 路径长度为2
+            pyflamegpu.setVariableInt("path_length", 2)
+        else:
+            # 路径长度为1
+            pyflamegpu.setVariableInt("path_length", 1)
     else:
-        # 没有找到路径
+        # 没有路径
+        pyflamegpu.setVariableInt("path_length", 0)
+
+    # 检查路径是否以起点开始
+    path_0 = pyflamegpu.getVariableIntArray20("shortest_path", 0)
+    if path_0 != start_vertex_id:
         pyflamegpu.setVariableInt("path_length", 0)
 
     return pyflamegpu.ALIVE
