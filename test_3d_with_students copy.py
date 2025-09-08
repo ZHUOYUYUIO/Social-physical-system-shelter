@@ -110,8 +110,6 @@ in_fn.setMessageInput("location")
 # Message input depends on output
 in_fn.dependsOn(out_fn)
 
-# 添加学生代理类型
-# 基于data/output/flamegpu_init_code.py的学生代理初始化
 
 
 # Dependency specification
@@ -123,6 +121,9 @@ model.generateLayers()
 # Create and init the simulation
 cuda_model = pyflamegpu.CUDASimulation(model)
 
+
+# 添加学生代理类型
+# 基于data/output/flamegpu_init_code.py的学生代理初始化
 # 导入flamegpu_init_code.py中的初始化函数
 import sys 
 import os
@@ -175,23 +176,14 @@ if pyflamegpu.VISUALISATION:
     stairwell_agt.setColor(pyflamegpu.RED);
     
     pen = m_vis.newPolylineSketch(1, 1, 1, 0.2)
-    pen.addVertex(275, 637, 0) # 起始点
-    pen.addVertex(69, 510, 0)
-    pen.addVertex(0, 301, 0)
-    pen.addVertex(1, 167, 0)
-    pen.addVertex(29, 142, 0)
-    pen.addVertex(57, 98, 0)
-    pen.addVertex(118, 67, 0)
-    pen.addVertex(109, 24, 0)
-    pen.addVertex(287, 0, 0)
-    pen.addVertex(286, 45, 0)
-    pen.addVertex(405, 154, 0)
-    pen.addVertex(435, 131, 0)
-    pen.addVertex(436, 72, 0)
-    pen.addVertex(467, 41, 0)
-    pen.addVertex(501, 35, 0)
-    pen.addVertex(543, 47, 0)
-    pen.addVertex(275, 637, 0) # 闭合点 
+    pen.addVertex(171.1506859746878, 502.3716148252133, 0) # 起始点
+    pen.addVertex(105.09561226965161, 359.44766954286024, 0)
+    pen.addVertex(0.0, 229.08098894753493, 0)
+    pen.addVertex(239.17631635762518, 0.0, 0)
+    pen.addVertex(389.8694328930578, 124.25844648550265, 0)
+    pen.addVertex(404.1783638363704, 443.24738321383484, 0)
+    pen.addVertex(295.51630976161687, 477.6256132465787, 0)
+    pen.addVertex(171.1506859746878, 502.3716148252133, 0) # 闭合点
     # Open the visualiser window 
     m_vis.activate()
 

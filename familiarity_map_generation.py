@@ -116,19 +116,25 @@ def generate_attraction_matrix_direct(
 
 # 示例调用
 if __name__ == "__main__":
-    m, n = 100,80  # 5x5 网格
+    m, n = 300,300  # 5x5 网格
     
     # 手动输入高吸引力点 (x, y, radius, attraction)
     attraction_points = [
         (10, 12, 3, 100),  # 中心点 (2,2)，半径 2，吸引力 100
         (50, 60, 2, 80),  # 点 (0,4)，半径 1.5，吸引力 80
+        (150, 160, 2, 80),  # 点 (0,4)，半径 1.5，吸引力 80
+        (250, 260, 2, 80),  # 点 (0,4)，半径 1.5，吸引力 80
+        (350, 360, 2, 80),  # 点 (0,4)，半径 1.5，吸引力 80
+        (10, 250, 2, 80),  # 点 (0,4)，半径 1.5，吸引力 80
+        (50, 260, 2, 80),  # 点 (0,4)，半径 1.5，吸引力 80
+        (150, 270, 2, 80)  # 点 (0,4)，半径 1.5，吸引力 80
     ]
     
     # 生成 JSON 格式
     json_output = generate_attraction_matrix_direct(m, n, attraction_points)
     
     # 保存为 JSON 文件
-    with open("attraction_matrix.json", "w") as f:
+    with open("attraction_matrix_campus.json", "w") as f:
         json.dump(json_output, f, indent=4)
     
     print("JSON 文件已生成！")

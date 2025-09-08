@@ -220,8 +220,7 @@ in_fn.dependsOn(out_fn)
 '''
 
 
-# 添加学生代理类型
-# 基于data/output/flamegpu_init_code.py的学生代理初始化
+
 
 
 # Dependency specification
@@ -238,6 +237,9 @@ import sys
 import os
 sys.path.append('data/output')
 from flamegpu_init_code import initialize_student_agent_population
+
+# 添加学生代理类型
+# 基于data/output/flamegpu_init_code.py的学生代理初始化
 
 # 初始化学生代理种群
 initialize_student_agent_population(model, cuda_model)

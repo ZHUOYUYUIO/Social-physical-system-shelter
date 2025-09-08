@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 FlameGPU学生代理初始化代码（随机分布版本）
-散点数: 7542
+散点数: 6229
 """
 
 import random
@@ -11,7 +11,7 @@ def initialize_student_agent_population(studentAgentPopulation):
     """
     初始化学生代理种群（随机分布）
     """
-    num_student_agents = 7542
+    num_student_agents = 6229
     print(f"初始化 {num_student_agents} 个学生代理个体（随机分布）")
     
     for i in range(num_student_agents):
