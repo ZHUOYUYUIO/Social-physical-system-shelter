@@ -3,7 +3,7 @@
 """
 FlameGPU学生代理初始化代码
 基于建筑物内散点数据生成
-总散点数: 6490
+总散点数: 6120
 """
 
 import json
@@ -88,6 +88,7 @@ def initialize_student_agent_population(model, cuda_model, population_file='data
             stairwell_agent.setVariableFloat("x", coordinates[0])
             stairwell_agent.setVariableFloat("y", coordinates[1])
             stairwell_agent.setVariableInt("stairwell_id", i)
+            stairwell_agent.setVariableInt("building_id", feature['properties']['building_id'])
 
             stairwell_agent.setVariableFloat("z", 0.0)  # 楼层高度
 
