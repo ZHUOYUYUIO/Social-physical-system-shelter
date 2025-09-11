@@ -22,6 +22,7 @@ import yaml
 def run_complete_workflow(boundary_file='data/boundary.geojson', 
                          buildings_file='data/buildings.geojson',
                          stairwells_file='data/stairwell.geojson',
+                         shelter_file='data/shelter_available.geojson',
                          base_population=50, 
                          variance=0.3):
     """
@@ -54,6 +55,10 @@ def run_complete_workflow(boundary_file='data/boundary.geojson',
     if not os.path.exists(stairwells_file):
         print(f"❌ can not find the builindings_file; 找不到建筑物文件: {stairwells_file}")
         return False    
+
+    if not os.path.exists(shelter_file):
+        print(f"❌ can not find the shelter_file; 找不到避难所文件: {shelter_file}")
+        return False
     
     try:
         # 步骤1：坐标转换
@@ -61,7 +66,7 @@ def run_complete_workflow(boundary_file='data/boundary.geojson',
         print("-" * 30)
         
         transformer = CommunityBuildingTransformer(target_crs='EPSG:3415')
-        transform_result = transformer.process_community_data(boundary_file, buildings_file, stairwells_file)
+        transform_result = transformer.process_community_data(boundary_file, buildings_file, stairwells_file, shelter_file)
         
         if not transform_result:
             print("❌ 坐标转换失败")
