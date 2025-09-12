@@ -161,7 +161,37 @@ class CommunityBuildingTransformer:
             print(f"加载避难所文件失败: {e}")
             raise
 
-    def check_coordinate_systems(self, boundary_gdf, buildings_gdf, stairwell_gdf=None, shelter_gdf=None):
+    def load_familiar_point(self, file_path):
+        """
+        加载熟悉点数据
+
+        Parameters:
+        -----------
+        file_path : str
+            熟悉点文件路径（支持shp, geojson, gpkg等格式）
+
+        Returns:
+        --------
+        GeoDataFrame : 熟悉点数据
+        """
+        try:
+            print(f"正在加载熟悉点文件: {file_path}")
+            familiar_point_gdf = gpd.read_file(file_path)
+
+            if len(familiar_point_gdf) == 0:
+                raise ValueError("熟悉点文件为空")
+
+            print(f"成功加载熟悉点数据，共 {len(familiar_point_gdf)} 个点")
+            print(f"坐标系: {familiar_point_gdf.crs}")
+            print(f"边界框: {familiar_point_gdf.total_bounds}")
+
+            return familiar_point_gdf
+
+        except Exception as e:
+            print(f"加载熟悉点文件失败: {e}")
+            raise
+
+    def check_coordinate_systems(self, boundary_gdf, buildings_gdf, stairwell_gdf=None, shelter_gdf=None, familiar_point_gdf=None):
         """
         检查数据集的坐标系是否一致
         
@@ -175,6 +205,8 @@ class CommunityBuildingTransformer:
             楼梯间数据
         shelter_gdf : GeoDataFrame, optional
             避难所数据
+        familiar_point_gdf : GeoDataFrame, optional
+            熟悉点数据
             
         Returns:
         --------
@@ -192,12 +224,17 @@ class CommunityBuildingTransformer:
         if shelter_gdf is not None:
             shelter_crs = shelter_gdf.crs
             print(f"避难所坐标系: {shelter_crs}")
+        if familiar_point_gdf is not None:
+            familiar_point_crs = familiar_point_gdf.crs
+            print(f"熟悉点坐标系: {familiar_point_crs}")
 
         crs_list = [boundary_crs, buildings_crs]
         if stairwell_gdf is not None:
             crs_list.append(stairwell_gdf.crs)
         if shelter_gdf is not None:
             crs_list.append(shelter_gdf.crs)
+        if familiar_point_gdf is not None:
+            crs_list.append(familiar_point_gdf.crs)
 
         unique_crs = set(map(str, crs_list))
         if len(unique_crs) == 1:
@@ -232,9 +269,9 @@ class CommunityBuildingTransformer:
             print(f"数据已经是目标坐标系 {self.target_crs}，无需转换")
             return geodata
     
-    def set_origin_to_bottom_left(self, boundary_gdf, buildings_gdf, stairwell_gdf=None, shelter_gdf=None):
+    def set_origin_to_bottom_left(self, boundary_gdf, buildings_gdf, stairwell_gdf=None, shelter_gdf=None, familiar_point_gdf=None):
         """
-        将社区边界、建筑物、楼梯间和避难所的左下角设置为(0,0)原点
+        将社区边界、建筑物、楼梯间、避难所和熟悉点的左下角设置为(0,0)原点
         
         Parameters:
         -----------
@@ -246,10 +283,12 @@ class CommunityBuildingTransformer:
             楼梯间数据
         shelter_gdf : GeoDataFrame, optional
             避难所数据
+        familiar_point_gdf : GeoDataFrame, optional
+            熟悉点数据
             
         Returns:
         --------
-        tuple : (转换后的边界数据, 转换后的建筑物数据, 转换后的楼梯间数据, 转换后的避难所数据, 偏移量)
+        tuple : (转换后的边界数据, 转换后的建筑物数据, 转换后的楼梯间数据, 转换后的避难所数据, 转换后的熟悉点数据, 偏移量)
         """
         # 计算整体边界框（包含边界、建筑物和楼梯间）
         boundary_bounds = boundary_gdf.total_bounds
@@ -277,6 +316,14 @@ class CommunityBuildingTransformer:
                 min(overall_bounds[1], shelter_bounds[1]),  # miny
                 max(overall_bounds[2], shelter_bounds[2]),  # maxx
                 max(overall_bounds[3], shelter_bounds[3])   # maxy
+            ]
+        if familiar_point_gdf is not None:
+            familiar_point_bounds = familiar_point_gdf.total_bounds
+            overall_bounds = [
+                min(overall_bounds[0], familiar_point_bounds[0]),  # minx
+                min(overall_bounds[1], familiar_point_bounds[1]),  # miny
+                max(overall_bounds[2], familiar_point_bounds[2]),  # maxx
+                max(overall_bounds[3], familiar_point_bounds[3])   # maxy
             ]
         
         minx, miny = overall_bounds[0], overall_bounds[1]
@@ -325,9 +372,20 @@ class CommunityBuildingTransformer:
             transformed_shelter = shelter_gdf.copy()
             transformed_shelter.geometry = transformed_shelter.geometry.apply(translate_shelter_geometry)
 
-        return transformed_boundary, transformed_buildings, transformed_stairwell, transformed_shelter, offset
+        # 转换熟悉点
+        transformed_familiar_point = None
+        if familiar_point_gdf is not None:
+            def translate_familiar_point_geometry(geom):
+                if geom is not None:
+                    return transform(lambda x, y: (x - minx, y - miny), geom)
+                return None
+
+            transformed_familiar_point = familiar_point_gdf.copy()
+            transformed_familiar_point.geometry = transformed_familiar_point.geometry.apply(translate_familiar_point_geometry)
+
+        return transformed_boundary, transformed_buildings, transformed_stairwell, transformed_shelter, transformed_familiar_point, offset
     
-    def process_community_data(self, boundary_file, buildings_file, stairwell_file=None, shelter_file=None):
+    def process_community_data(self, boundary_file, buildings_file, stairwell_file=None, shelter_file=None, familiar_point_file=None):
         """
         完整的社区数据处理流程
         
@@ -341,6 +399,8 @@ class CommunityBuildingTransformer:
             楼梯间文件路径
         shelter_file : str, optional
             避难所文件路径
+        familiar_point_file : str, optional
+            熟悉点文件路径
             
         Returns:
         --------
@@ -359,10 +419,13 @@ class CommunityBuildingTransformer:
         shelter_gdf = None
         if shelter_file:
             shelter_gdf = self.load_shelter(shelter_file)
+        familiar_point_gdf = None
+        if familiar_point_file:
+            familiar_point_gdf = self.load_familiar_point(familiar_point_file)
         
         # 2. 检查坐标系
         print("\n2. 检查坐标系")
-        self.check_coordinate_systems(boundary_gdf, buildings_gdf, stairwell_gdf, shelter_gdf)
+        self.check_coordinate_systems(boundary_gdf, buildings_gdf, stairwell_gdf, shelter_gdf, familiar_point_gdf)
         
         # 3. 转换为目标坐标系
         print("\n3. 转换为目标坐标系")
@@ -375,11 +438,14 @@ class CommunityBuildingTransformer:
         transformed_shelter = None
         if shelter_gdf is not None:
             transformed_shelter = self.transform_to_target_crs(shelter_gdf)
+        transformed_familiar_point = None
+        if familiar_point_gdf is not None:
+            transformed_familiar_point = self.transform_to_target_crs(familiar_point_gdf)
         
         # 4. 设置原点为左下角
         print("\n4. 设置原点为左下角")
-        final_boundary, final_buildings, final_stairwell, final_shelter, offset = self.set_origin_to_bottom_left(
-            transformed_boundary, transformed_buildings, transformed_stairwell, transformed_shelter
+        final_boundary, final_buildings, final_stairwell, final_shelter, final_familiar_point, offset = self.set_origin_to_bottom_left(
+            transformed_boundary, transformed_buildings, transformed_stairwell, transformed_shelter, transformed_familiar_point
         )
         
         # 5. 显示结果信息
@@ -390,12 +456,16 @@ class CommunityBuildingTransformer:
             print(f"楼梯间数量: {len(final_stairwell)}")
         if final_shelter is not None:
             print(f"避难所数量: {len(final_shelter)}")
+        if final_familiar_point is not None:
+            print(f"熟悉点数量: {len(final_familiar_point)}")
         print(f"新的社区边界框: {final_boundary.total_bounds}")
         print(f"新的建筑物边界框: {final_buildings.total_bounds}")
         if final_stairwell is not None:
             print(f"新的楼梯间边界框: {final_stairwell.total_bounds}")
         if final_shelter is not None:
             print(f"新的避难所边界框: {final_shelter.total_bounds}")
+        if final_familiar_point is not None:
+            print(f"新的熟悉点边界框: {final_familiar_point.total_bounds}")
         print(f"左下角坐标: ({final_boundary.total_bounds[0]:.2f}, {final_boundary.total_bounds[1]:.2f})")
         
         result = {
@@ -413,6 +483,9 @@ class CommunityBuildingTransformer:
         if final_shelter is not None:
             result['shelter_data'] = final_shelter
             result['original_shelter_crs'] = str(shelter_gdf.crs)
+        if final_familiar_point is not None:
+            result['familiar_point_data'] = final_familiar_point
+            result['original_familiar_point_crs'] = str(familiar_point_gdf.crs)
         
         return result
     
@@ -470,6 +543,16 @@ class CommunityBuildingTransformer:
             shelter_geojson = os.path.join(output_dir, 'transformed_shelter_available.geojson')
             result['shelter_data'].to_file(shelter_geojson, driver='GeoJSON')
             print(f"避难所数据已保存到: {shelter_geojson}")
+
+        # 保存熟悉点（如果存在）
+        if 'familiar_point_data' in result:
+            familiar_point_output = os.path.join(output_dir, 'transformed_familiar_point.shp')
+            result['familiar_point_data'].to_file(familiar_point_output)
+            print(f"熟悉点数据已保存到: {familiar_point_output}")
+
+            familiar_point_geojson = os.path.join(output_dir, 'transformed_familiar_point.geojson')
+            result['familiar_point_data'].to_file(familiar_point_geojson, driver='GeoJSON')
+            print(f"熟悉点数据已保存到: {familiar_point_geojson}")
         
         # 保存转换信息
         info_output = os.path.join(output_dir, 'transformation_info.txt')
@@ -482,6 +565,8 @@ class CommunityBuildingTransformer:
                 f.write(f"原始楼梯间坐标系: {result['original_stairwell_crs']}\n")
             if 'original_shelter_crs' in result:
                 f.write(f"原始避难所坐标系: {result['original_shelter_crs']}\n")
+            if 'original_familiar_point_crs' in result:
+                f.write(f"原始熟悉点坐标系: {result['original_familiar_point_crs']}\n")
             f.write(f"目标坐标系: {result['target_crs']}\n")
             f.write(f"偏移量: {result['offset']}\n")
             f.write(f"社区边界数量: {len(result['boundary_data'])}\n")
@@ -490,12 +575,16 @@ class CommunityBuildingTransformer:
                 f.write(f"楼梯间数量: {len(result['stairwell_data'])}\n")
             if 'shelter_data' in result:
                 f.write(f"避难所数量: {len(result['shelter_data'])}\n")
+            if 'familiar_point_data' in result:
+                f.write(f"熟悉点数量: {len(result['familiar_point_data'])}\n")
             f.write(f"新的社区边界框: {result['boundary_data'].total_bounds}\n")
             f.write(f"新的建筑物边界框: {result['buildings_data'].total_bounds}\n")
             if 'stairwell_data' in result:
                 f.write(f"新的楼梯间边界框: {result['stairwell_data'].total_bounds}\n")
             if 'shelter_data' in result:
                 f.write(f"新的避难所边界框: {result['shelter_data'].total_bounds}\n")
+            if 'familiar_point_data' in result:
+                f.write(f"新的熟悉点边界框: {result['familiar_point_data'].total_bounds}\n")
         
         print(f"转换信息已保存到: {info_output}")
 
@@ -532,7 +621,19 @@ def create_sample_data():
     ]
     shelter_gdf = gpd.GeoDataFrame(geometry=shelters, crs='EPSG:4326')
     
-    return boundary_gdf, buildings_gdf, stairwell_gdf, shelter_gdf
+    # 创建示例熟悉点
+    familiar_points = [
+        Point(150, 150),
+        Point(350, 200),
+        Point(550, 350),
+        Point(750, 250),
+        Point(200, 550),
+        Point(450, 450),
+        Point(80, 300)
+    ]
+    familiar_point_gdf = gpd.GeoDataFrame(geometry=familiar_points, crs='EPSG:4326')
+    
+    return boundary_gdf, buildings_gdf, stairwell_gdf, shelter_gdf, familiar_point_gdf
 
 def main():
     """主函数 - 演示使用方法"""
@@ -544,7 +645,7 @@ def main():
     
     # 创建示例数据
     print("创建示例数据...")
-    boundary_gdf, buildings_gdf, stairwell_gdf, shelter_gdf = create_sample_data()
+    boundary_gdf, buildings_gdf, stairwell_gdf, shelter_gdf, familiar_point_gdf = create_sample_data()
     
     # 保存示例数据
     os.makedirs('sample_data', exist_ok=True)
@@ -552,6 +653,7 @@ def main():
     buildings_gdf.to_file('sample_data/sample_buildings.shp')
     stairwell_gdf.to_file('sample_data/sample_stairwell.geojson', driver='GeoJSON')
     shelter_gdf.to_file('sample_data/sample_shelter_available.geojson', driver='GeoJSON')
+    familiar_point_gdf.to_file('sample_data/sample_familiar_point.geojson', driver='GeoJSON')
     print("示例数据已保存到 sample_data/ 目录")
     
     # 执行转换
@@ -559,7 +661,8 @@ def main():
         'sample_data/sample_boundary.shp',
         'sample_data/sample_buildings.shp',
         'sample_data/sample_stairwell.geojson',
-        'sample_data/sample_shelter_available.geojson'
+        'sample_data/sample_shelter_available.geojson',
+        'sample_data/sample_familiar_point.geojson'
     )
     
     # 保存结果

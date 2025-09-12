@@ -1,5 +1,5 @@
 {
-"type": "FeatureCollection", 
+"type": "FeatureCollection",
 "name": "transformed_shelter_available",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3415" } },
 "features": [

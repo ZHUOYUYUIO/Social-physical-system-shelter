@@ -2,6 +2,31 @@ import numpy as np
 import json
 import os
 from shapely.geometry import Point
+from collections import deque
+
+def load_familiar_points_from_geojson(geojson_path):
+    """
+    从 GeoJSON 文件中读取熟悉点坐标
+    
+    Parameters:
+    - geojson_path: GeoJSON 文件路径
+    
+    Returns:
+    - List of tuples (x, y) representing point coordinates
+    """
+    with open(geojson_path, 'r', encoding='utf-8') as f:
+        geojson_data = json.load(f)
+    
+    points = []
+    for feature in geojson_data['features']:
+        if feature['geometry']['type'] == 'Point':
+            coords = feature['geometry']['coordinates']
+            # 转换为整数坐标
+            x = int(round(coords[0]))
+            y = int(round(coords[1]))
+            points.append((x, y))
+    
+    return points
 
 def generate_attraction_matrix(
     m, n,
@@ -61,13 +86,10 @@ def generate_attraction_matrix(
     else:
         return attraction_matrix
 
-import numpy as np
-from collections import deque
-
 def generate_attraction_matrix_direct(
     m, n,
     attraction_points,  # [(x, y, radius, base_attraction)]
-    decay_rate=0.5,     # 每层衰减比例 (0~1)
+    decay_rate=0.8,     # 每层衰减比例 (0~1)
     normalize=False,
     output_json=True
 ):
@@ -113,38 +135,54 @@ def generate_attraction_matrix_direct(
     else:
         return attraction_matrix
 
-
-
 # 示例调用
 if __name__ == "__main__":
-    m, n = 500,500  # 5x5 网格
+    # 设置矩阵维度
+    m, n = 500, 500  # 500x500 网格
     
-
-    # 手动输入高吸引力点 (x, y, radius, attraction)
-    attraction_points = [
-        (10, 12, 3, 100),  # 中心点 (2,2)，半径 2，吸引力 100
-        (50, 60, 2, 80),  # 点 (0,4)，半径 1.5，吸引力 80
-        (150, 160, 2, 80),  # 点 (0,4)，半径 1.5，吸引力 80
-        (250, 260, 2, 80),  # 点 (0,4)，半径 1.5，吸引力 80
-        (350, 360, 2, 80),  # 点 (0,4)，半径 1.5，吸引力 80
-        (10, 250, 2, 80),  # 点 (0,4)，半径 1.5，吸引力 80
-        (50, 260, 2, 80),  # 点 (0,4)，半径 1.5，吸引力 80
-        (150, 270, 2, 80)  # 点 (0,4)，半径 1.5，吸引力 80
-    ]
-    
-    # 生成 JSON 格式
-    json_output = generate_attraction_matrix_direct(m, n, attraction_points)
-    
-    # 保存为 JSON 文件
-    # 获取脚本所在目录的父目录（项目根目录）
+    # 获取脚本所在目录
     script_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(script_dir)  # 从 data/env_data 回到项目根目录
-    output_path = os.path.join(project_root, "data", "env_data", "attraction_matrix_campus.json")
-
-    with open(output_path, "w") as f:
-        json.dump(json_output, f, indent=4)
     
-    print("JSON 文件已生成！")
-    print(json.dumps(json_output, indent=4))
+    # 读取 transformed_familiar_point.geojson 文件
+    geojson_path = os.path.join(project_root, "output", "transformed_familiar_point.geojson")
+    
+    try:
+        # 加载熟悉点坐标
+        familiar_points = load_familiar_points_from_geojson(geojson_path)
+        print(f"成功加载 {len(familiar_points)} 个熟悉点:")
+        for i, (x, y) in enumerate(familiar_points):
+            print(f"  点 {i+1}: ({x}, {y})")
+        
+        # 将坐标转换为吸引力点格式 (x, y, radius, attraction)
+        # 默认设置：半径为5，吸引力为80
+        default_radius = 10
+        default_attraction = 80
+        
+        attraction_points = []
+        for x, y in familiar_points:
+            attraction_points.append((x, y, default_radius, default_attraction))
+        
+        print(f"\n转换后的吸引力点:")
+        for i, (x, y, r, a) in enumerate(attraction_points):
+            print(f"  点 {i+1}: 坐标({x}, {y}), 半径={r}, 吸引力={a}")
+        
+        # 生成 JSON 格式的吸引力矩阵
+        json_output = generate_attraction_matrix_direct(m, n, attraction_points)
+        
+        # 保存为 JSON 文件
+        output_path = os.path.join(project_root, "env_data", "attraction_matrix_familiar_points.json")
+        
+        with open(output_path, "w") as f:
+            json.dump(json_output, f, indent=4)
+        
+        print(f"\n熟悉点吸引力矩阵 JSON 文件已生成: {output_path}")
+        print("文件大小:", len(json_output["macro_environment"]["map"]), "个数据点")
+        
+    except FileNotFoundError:
+        print(f"错误: 找不到文件 {geojson_path}")
+        print("请确保 transformed_familiar_point.geojson 文件存在于 data/output/ 目录中")
+    except Exception as e:
+        print(f"处理文件时出错: {e}")
 
-    #python familiarity_map_generation.py
+    # 运行命令: python data/env_data/familiarity_map_generation_from_geojson.py

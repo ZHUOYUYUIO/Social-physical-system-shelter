@@ -23,6 +23,7 @@ def run_complete_workflow(boundary_file='data/boundary.geojson',
                          buildings_file='data/buildings.geojson',
                          stairwells_file='data/stairwell.geojson',
                          shelter_file='data/shelter_available.geojson',
+                         familiar_point_file='data/familiar_point.geojson',
                          base_population=50, 
                          variance=0.3):
     """
@@ -60,13 +61,17 @@ def run_complete_workflow(boundary_file='data/boundary.geojson',
         print(f"❌ can not find the shelter_file; 找不到避难所文件: {shelter_file}")
         return False
     
+    if not os.path.exists(familiar_point_file):
+        print(f"❌ can not find the familiar_point_file; 找不到熟悉点文件: {familiar_point_file}")
+        return False
+    
     try:
         # 步骤1：坐标转换
         print("\n📋 步骤1：坐标转换")
         print("-" * 30)
         
         transformer = CommunityBuildingTransformer(target_crs='EPSG:3415')
-        transform_result = transformer.process_community_data(boundary_file, buildings_file, stairwells_file, shelter_file)
+        transform_result = transformer.process_community_data(boundary_file, buildings_file, stairwells_file, shelter_file, familiar_point_file)
         
         if not transform_result:
             print("❌ 坐标转换失败")
