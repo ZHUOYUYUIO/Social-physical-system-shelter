@@ -138,7 +138,7 @@ def generate_attraction_matrix_direct(
 # 示例调用
 if __name__ == "__main__":
     # 设置矩阵维度
-    m, n = 500, 500  # 500x500 网格
+    m, n = 700, 700  # 500x500 网格
     
     # 获取脚本所在目录
     script_dir = os.path.dirname(os.path.abspath(__file__))

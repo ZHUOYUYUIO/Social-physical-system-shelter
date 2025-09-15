@@ -18,7 +18,7 @@ class write_env_hostfn(pyflamegpu.HostFunction):
       FLAMEGPU.environment.importMacroProperty("map", "attraction_matrix_familiar_points.json");
 
       FLAMEGPU.environment.exportMacroProperty("map", "out1.json");
-
+ 
     # Python does not allow the increment operator to be overridden
 
 model = pyflamegpu.ModelDescription("F_MAP_tutorial")
