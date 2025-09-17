@@ -4,6 +4,20 @@
     {
       "type": "Feature",
       "properties": {
+        "building_id": 10
+      },
+      "geometry": {
+        "coordinates": [
+          114.19664607300331,
+          22.694748683238544
+        ],
+        "type": "Point"
+      },
+      "id": 14
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "building_id": 11
       },
       "geometry": {
@@ -147,6 +161,19 @@
         "type": "Point"
       },
       "id": 25
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "building_id": 0
+      },
+      "geometry": {
+        "coordinates": [
+          114.19757659312228,
+          22.69305389681007
+        ],
+        "type": "Point"
+      }
     },
     {
       "type": "Feature",
@@ -342,33 +369,6 @@
         "coordinates": [
           114.19975055384731,
           22.691916315009863
-        ],
-        "type": "Point"
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "building_id": 0
-      },
-      "geometry": {
-        "coordinates": [
-          114.19754736161258,
-          22.693092719955402
-        ],
-        "type": "Point"
-      },
-      "id": 27
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "building_id": 10
-      },
-      "geometry": {
-        "coordinates": [
-          114.19655616538313,
-          22.6947757051486
         ],
         "type": "Point"
       }

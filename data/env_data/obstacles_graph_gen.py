@@ -2,7 +2,7 @@ import numpy as np
 import math
 import json
 import os
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any, Optional
 
 def expand_obstacle_simple(obstacle, margin=0.5):
     """
@@ -153,11 +153,11 @@ def is_edge_visible(original_obstacles, point1, point2, epsilon=1e-10):
     
     return True
 
-def generate_visibility_graph(original_obstacles, expanded_obstacles):
-    """生成可视图"""
+def generate_visibility_graph(original_obstacles, expanded_obstacles, additional_points: Optional[List[Tuple[int, int]]] = None):
+    """生成可视图，可选地加入额外点（如shelter）参与可视连边"""
     all_vertices = []
     vertex_to_id = {}
-    
+
     # 添加所有扩展后的顶点
     vertex_id = 1
     for i, obstacle in enumerate(expanded_obstacles):
@@ -165,18 +165,27 @@ def generate_visibility_graph(original_obstacles, expanded_obstacles):
             all_vertices.append(point)
             vertex_to_id[point] = str(vertex_id)
             vertex_id += 1
-    
+
+    # 添加额外点（例如 shelter 点）
+    added_extra = 0
+    if additional_points:
+        for pt in additional_points:
+            all_vertices.append(pt)
+            vertex_to_id[pt] = str(vertex_id)
+            vertex_id += 1
+            added_extra += 1
+
     # 生成可见边
     edges = []
     n = len(all_vertices)
-    
-    print(f"共有 {n} 个扩展顶点")
-    
+
+    print(f"共有 {n} 个顶点（含扩展顶点{n - added_extra}个，额外点{added_extra}个）")
+
     for i in range(n):
         for j in range(i + 1, n):
             if is_edge_visible(original_obstacles, all_vertices[i], all_vertices[j]):
                 edges.append((all_vertices[i], all_vertices[j]))
-    
+
     print(f"生成 {len(edges)} 条可见边")
     return all_vertices, edges, vertex_to_id
 
@@ -219,8 +228,75 @@ def convert_to_integer_points(buildings: List[np.ndarray], scale_factor: float =
 
     return converted_buildings
 
+def _centroid_of_ring(coords: List[List[float]]) -> Tuple[float, float]:
+    """
+    计算简单多边形外环的近似质心（用顶点平均，避免引入额外依赖）
+    """
+    if not coords:
+        return (0.0, 0.0)
+    ring = coords
+    # 移除闭合重复点
+    if len(ring) >= 2 and ring[0] == ring[-1]:
+        ring = ring[:-1]
+    if not ring:
+        return (0.0, 0.0)
+    sx = 0.0
+    sy = 0.0
+    for x, y in ring:
+        sx += float(x)
+        sy += float(y)
+    n = len(ring)
+    return (sx / n, sy / n)
+
+def load_points_from_geojson(file_path: str) -> List[Tuple[float, float]]:
+    """
+    从GeoJSON中加载 Point/MultiPoint 的坐标为点列表
+    """
+    points: List[Tuple[float, float]] = []
+    with open(file_path, 'r', encoding='utf-8') as f:
+        geojson_data = json.load(f)
+
+    for feature in geojson_data.get('features', []):
+        geom = feature.get('geometry')
+        if not geom:
+            continue
+        gtype = geom.get('type')
+        coords = geom.get('coordinates')
+        if gtype == 'Point' and isinstance(coords, (list, tuple)) and len(coords) >= 2:
+            points.append((coords[0], coords[1]))
+        elif gtype == 'MultiPoint' and isinstance(coords, list):
+            for c in coords:
+                if isinstance(c, (list, tuple)) and len(c) >= 2:
+                    points.append((c[0], c[1]))
+        elif gtype == 'Polygon' and isinstance(coords, list) and len(coords) >= 1:
+            # 取外环的近似质心
+            outer = coords[0]
+            cx, cy = _centroid_of_ring(outer)
+            points.append((cx, cy))
+        elif gtype == 'MultiPolygon' and isinstance(coords, list):
+            for poly in coords:
+                if isinstance(poly, list) and len(poly) >= 1:
+                    outer = poly[0]
+                    cx, cy = _centroid_of_ring(outer)
+                    points.append((cx, cy))
+    return points
+
+def _load_shelter_points_from_csv(csv_path: str) -> List[Tuple[float, float]]:
+    points: List[Tuple[float, float]] = []
+    try:
+        import csv
+        with open(csv_path, 'r', encoding='utf-8') as f:
+            for row in csv.DictReader(f):
+                x = float(row.get('x'))
+                y = float(row.get('y'))
+                points.append((x, y))
+    except Exception as e:
+        print(f"读取 shelter_points.csv 失败: {e}")
+    return points
+
 def generate_building_graph(geojson_path: str, output_path: str, margin: float = 0.1,
-                          scale_factor: float = 1.0):
+                          scale_factor: float = 1.0, shelters_geojson_path: Optional[str] = None,
+                          shelters_csv_path: Optional[str] = None):
     """
     从GeoJSON文件生成建筑物图
     """
@@ -241,9 +317,44 @@ def generate_building_graph(geojson_path: str, output_path: str, margin: float =
         expanded_obstacles.append(expanded)
         print(f"建筑物 {i+1} 扩展完成")
 
+    # 读取 shelter 点（CSV优先，其次GeoJSON）并转换为整数坐标
+    additional_points_int: List[Tuple[int, int]] = []
+    loaded_sources = []
+    if shelters_csv_path and os.path.exists(shelters_csv_path):
+        try:
+            print(f"正在加载shelter点(CSV): {shelters_csv_path}")
+            shelter_pts = _load_shelter_points_from_csv(shelters_csv_path)
+            for (x, y) in shelter_pts:
+                xi = int(round(x * scale_factor))
+                yi = int(round(y * scale_factor))
+                additional_points_int.append((xi, yi))
+            loaded_sources.append(('csv', len(additional_points_int)))
+        except Exception as e:
+            print(f"加载 shelter CSV 失败: {e}")
+    elif shelters_geojson_path and os.path.exists(shelters_geojson_path):
+        try:
+            print(f"正在加载shelter点: {shelters_geojson_path}")
+            shelter_pts = load_points_from_geojson(shelters_geojson_path)
+            # 与建筑物同样的整数化与缩放策略
+            for (x, y) in shelter_pts:
+                xi = int(round(x * scale_factor))
+                yi = int(round(y * scale_factor))
+                additional_points_int.append((xi, yi))
+            loaded_sources.append(('geojson', len(additional_points_int)))
+        except Exception as e:
+            print(f"加载shelter点失败: {e}")
+
+    if loaded_sources:
+        src, cnt = loaded_sources[-1]
+        print(f"加载shelter点 {cnt} 个，来源: {src}")
+
     # 生成可视图
     print("正在生成可视图...")
-    vertices, edges, vertex_to_id = generate_visibility_graph(int_buildings, expanded_obstacles)
+    vertices, edges, vertex_to_id = generate_visibility_graph(
+        int_buildings,
+        expanded_obstacles,
+        additional_points=additional_points_int if additional_points_int else None,
+    )
 
     # 构建输出
     nodes = [{"id": vertex_to_id[v], "bar": [int(v[0]), int(v[1])]} for v in vertices]

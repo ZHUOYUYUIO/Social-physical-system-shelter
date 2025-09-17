@@ -33,12 +33,12 @@ agent.newVariableArrayInt("shortest_path", 20)  # 存储最短路径的顶点ID�
 
 
 
-agent.newVariableArrayFloat("shortest_value",77, [-1.0] * 77)
+agent.newVariableArrayFloat("shortest_value",148, [-1.0] * 148)
 
 # Dijkstra算法需要的变量
-agent.newVariableArrayFloat("distances", 77, [999999.0] * 77)  # 距离数组，初始化为无穷大
-agent.newVariableArrayInt("visited", 77, [0] * 77)  # 访问标记数组
-agent.newVariableArrayInt("previous", 77, [-1] * 77)  # 前驱节点数组
+agent.newVariableArrayFloat("distances", 148, [999999.0] * 148)  # 距离数组，初始化为无穷大
+agent.newVariableArrayInt("visited", 148, [0] * 148)  # 访问标记数组
+agent.newVariableArrayInt("previous", 148, [-1] * 148)  # 前驱节点数组
 agent.newVariableInt("vertex_count")  # 顶点数量
 agent.newVariableInt("edge_count")  # 边数量
 
@@ -67,7 +67,7 @@ def ShortestPathFn(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.M
 
     # 定义常量
     INF = 999999.0
-    vertex_count = 77  # 假设图中有16个顶点
+    vertex_count = 148  # 假设图中有16个顶点
 
     # 获取起点和终点ID（可以从agent变量中获取，或者设置为固定值）
     start_vertex_id = pyflamegpu.getVariableInt("start_vertex_id")
@@ -76,15 +76,15 @@ def ShortestPathFn(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.M
     ###
     # 起点是哪个，我们就把它的list对应的i，设置为0。
     ###
-    pyflamegpu.setVariableFloatArray77("shortest_value", start_vertex_id, 0)
+    pyflamegpu.setVariableFloatArray148("shortest_value", start_vertex_id, 0)
 
     #然后遍历所有顶点（1-16），除了我们的起点id外，如果它和起点id有连线，我们就把它的list对应的i，设置为起点到它的距离。
 
     #遍历起点的id，线的值就设置为shortest_value的起点对应的i的值+边的值。
     # 先初始化所有顶点的shortest_value为INF
-    for i in range(77):
+    for i in range(148):
         if i != start_vertex_id:
-            pyflamegpu.setVariableFloatArray77("shortest_value", i, INF)
+            pyflamegpu.setVariableFloatArray148("shortest_value", i, INF)
 
     # 遍历起点连接的边，设置对应的shortest_value
     for edge in fgraph.outEdges(start_vertex_id):
@@ -94,7 +94,7 @@ def ShortestPathFn(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.M
         foo = edge.getPropertyInt("foo")
 
         # 将foo值存储到对应顶点ID的位置
-        pyflamegpu.setVariableFloatArray77("shortest_value", dest_vertex_index, foo)
+        pyflamegpu.setVariableFloatArray148("shortest_value", dest_vertex_index, foo)
             
 
 
@@ -103,25 +103,25 @@ def ShortestPathFn(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.M
     end_index = fgraph.getVertexIndex(end_vertex_id)
 
     # 初始化起点距离为0
-    pyflamegpu.setVariableFloatArray77("distances", start_index, 0.0)
+    pyflamegpu.setVariableFloatArray148("distances", start_index, 0.0)
     # 初始化起点前驱为-1
-    pyflamegpu.setVariableIntArray77("previous", start_index, -1)
+    pyflamegpu.setVariableIntArray148("previous", start_index, -1)
     # 初始化其他顶点的距离为无穷大，前驱为-1
     for i in range(vertex_count):
         if i != start_index:
-            pyflamegpu.setVariableFloatArray77("distances", i, INF)
-            pyflamegpu.setVariableIntArray77("previous", i, -1)
-        pyflamegpu.setVariableIntArray77("visited", i, 0)
+            pyflamegpu.setVariableFloatArray148("distances", i, INF)
+            pyflamegpu.setVariableIntArray148("previous", i, -1)
+        pyflamegpu.setVariableIntArray148("visited", i, 0)
 
     # Dijkstra算法主循环
     for _ in range(vertex_count):
         # 找到当前未访问顶点中距离最小的顶点
-        min_distance = INF
+        min_distance = INF      
         current_index = -1
 
         for i in range(vertex_count):
-            visited_i = pyflamegpu.getVariableIntArray77("visited", i)
-            distance_i = pyflamegpu.getVariableFloatArray77("distances", i)
+            visited_i = pyflamegpu.getVariableIntArray148("visited", i)
+            distance_i = pyflamegpu.getVariableFloatArray148("distances", i) 
             if visited_i == 0 and distance_i < min_distance:
                 min_distance = distance_i
                 current_index = i
@@ -130,7 +130,7 @@ def ShortestPathFn(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.M
             break
 
         # 标记当前顶点为已访问
-        pyflamegpu.setVariableIntArray77("visited", current_index, 1)
+        pyflamegpu.setVariableIntArray148("visited", current_index, 1)   
 
         # 如果到达终点，可以提前结束
         if current_index == end_index:
@@ -142,17 +142,17 @@ def ShortestPathFn(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.M
 
             dest_index = edge.getEdgeDestination()
 
-            visited_dest = pyflamegpu.getVariableIntArray77("visited", dest_index)
+            visited_dest = pyflamegpu.getVariableIntArray148("visited", dest_index)
             if visited_dest == 0:
                 # 获取边的权重
                 edge_weight = edge.getPropertyFloat("foo")
-                current_distance = pyflamegpu.getVariableFloatArray77("distances", current_index)
+                current_distance = pyflamegpu.getVariableFloatArray148("distances", current_index)
                 new_distance = current_distance + edge_weight
 
-                dest_distance = pyflamegpu.getVariableFloatArray77("distances", dest_index)
+                dest_distance = pyflamegpu.getVariableFloatArray148("distances", dest_index)
                 if new_distance < dest_distance:
-                    pyflamegpu.setVariableFloatArray77("distances", dest_index, new_distance)
-                    pyflamegpu.setVariableIntArray77("previous", dest_index, current_index)
+                    pyflamegpu.setVariableFloatArray148("distances", dest_index, new_distance)
+                    pyflamegpu.setVariableIntArray148("previous", dest_index, current_index)
 
     # 重建最短路径 - 使用pyflamegpu方法完全避免循环和索引操作
 
@@ -177,7 +177,7 @@ def ShortestPathFn(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.M
             break
         
         # 获取前驱节点
-        current = pyflamegpu.getVariableIntArray77("previous", current)
+        current = pyflamegpu.getVariableIntArray148("previous", current)
 
     # 设置路径长度
     pyflamegpu.setVariableInt("path_length", path_length)
@@ -227,11 +227,11 @@ for i in range(AGENT_COUNT):
         agent.setVariableInt("start_vertex_id", 1)  # 从顶点1开始
         agent.setVariableInt("end_vertex_id", 10)   # 到顶点10结束
     elif i == 1:
-        agent.setVariableInt("start_vertex_id", 2)  # 从顶点2开始
-        agent.setVariableInt("end_vertex_id", 15)   # 到顶点15结束
+        agent.setVariableInt("start_vertex_id", 36)  # 从顶点2开始
+        agent.setVariableInt("end_vertex_id", 46)   # 到顶点15结束
     else:
-        agent.setVariableInt("start_vertex_id", 60)  # 从顶点5开始
-        agent.setVariableInt("end_vertex_id", 45)   # 到顶点20结束
+        agent.setVariableInt("start_vertex_id", 21)  # 从顶点5开始
+        agent.setVariableInt("end_vertex_id", 122)   # 到顶点20结束
 
 cuda_model.setPopulationData(AgentPopulation)
 

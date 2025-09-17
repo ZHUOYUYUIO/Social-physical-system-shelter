@@ -18,7 +18,7 @@ model = pyflamegpu.ModelDescription("F_MAP_tutorial")
 
 env = model.Environment()
 env.newMacroPropertyInt("map_3d", 3, 20,2)  
-
+ 
 
 
 # Define an agent named point
