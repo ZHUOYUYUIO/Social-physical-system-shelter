@@ -110,7 +110,7 @@ def main():
     data_dir = os.path.join(current_dir, "..", "output")
     stairwell_path = os.path.join(data_dir, "transformed_stairwell.geojson")
     building_path = os.path.join(data_dir, "transformed_buildings.geojson")
-    output_path = os.path.join(data_dir, "stairwell.geojson")
+    output_path = os.path.join(data_dir, "stairwell_withoutput.geojson")
 
     # 检查文件是否存在，给出更友好的报错
     if not os.path.exists(stairwell_path):

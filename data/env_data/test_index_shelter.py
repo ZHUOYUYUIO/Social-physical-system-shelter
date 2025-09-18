@@ -33,6 +33,18 @@ def compute_squared_distance(ax: float, ay: float, bx: float, by: float) -> floa
 	return (ax - bx) * (ax - bx) + (ay - by) * (ay - by)
 
 
+def build_exact_bar_lookup(nodes: List[Dict[str, Any]]) -> Dict[Tuple[float, float], str]:
+	lookup: Dict[Tuple[float, float], str] = {}
+	for n in nodes:
+		bar = n.get("bar")
+		if not bar or not isinstance(bar, list) or len(bar) < 2:
+			continue
+		xn = float(bar[0])
+		yn = float(bar[1])
+		lookup[(xn, yn)] = str(n.get("id"))
+	return lookup
+
+
 def find_nearest_graph_id_for_point(px: float, py: float, nodes: List[Dict[str, Any]]) -> str:
 	best_id: str = ""
 	best_d2: float = float("inf")
@@ -61,7 +73,7 @@ def write_shelters_with_graph_id(points: List[Dict[str, Any]], output_csv_path: 
 def main():
 	# Resolve paths relative to this file inside data/env_data
 	current_dir = os.path.dirname(os.path.abspath(__file__))
-	graph_json_path = os.path.join(current_dir, "buildings_visibility_graph_renumbered.json")
+	graph_json_path = os.path.join(current_dir, "expanded_visibility_graph_renumbered.json")
 	shelter_csv_path = os.path.join(current_dir, "..", "output", "shelter_points.csv")
 	output_csv_path = os.path.join(current_dir, "..", "output", "shelter_points_with_graph_id.csv")
 
@@ -75,9 +87,15 @@ def main():
 	nodes = load_graph_nodes(graph_json_path)
 	shelters = load_shelter_points(shelter_csv_path)
 
-	# For each shelter, find nearest graph node by bar coordinates
+	# Build exact (x,y) -> id lookup for precise matches
+	exact_lookup = build_exact_bar_lookup(nodes)
+
+	# For each shelter, prefer exact match; otherwise, find nearest by bar coordinates
 	for s in shelters:
-		gid = find_nearest_graph_id_for_point(s["x"], s["y"], nodes)
+		key = (s["x"], s["y"])
+		gid = exact_lookup.get(key)
+		if gid is None:
+			gid = find_nearest_graph_id_for_point(s["x"], s["y"], nodes)
 		s["graph_id"] = gid
 
 	write_shelters_with_graph_id(shelters, output_csv_path)

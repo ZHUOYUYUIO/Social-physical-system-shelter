@@ -1,0 +1,453 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          187.40019357966958,
+          422.7226197546115
+        ]
+      },
+      "properties": {
+        "building_id": 11,
+        "outstop_x": 194.41173469143112,
+        "outstop_y": 422.26116605468803,
+        "graph_id": "149"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          185.35192236152943,
+          403.40369403071236
+        ]
+      },
+      "properties": {
+        "building_id": 11,
+        "outstop_x": 193.13693932701278,
+        "outstop_y": 402.8913352175176,
+        "graph_id": "150"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          292.7367286423105,
+          513.2607814649818
+        ]
+      },
+      "properties": {
+        "building_id": 12,
+        "outstop_x": 295.43180987053796,
+        "outstop_y": 506.95780795384195,
+        "graph_id": "151"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          275.9681801806437,
+          489.26135878893547
+        ]
+      },
+      "properties": {
+        "building_id": 13,
+        "outstop_x": 270.22600721460566,
+        "outstop_y": 487.05522969232345,
+        "graph_id": "152"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          313.3812172956532,
+          451.648531171144
+        ]
+      },
+      "properties": {
+        "building_id": 13,
+        "outstop_x": 312.69832556978713,
+        "outstop_y": 444.86895862826276,
+        "graph_id": "153"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          338.08554926217766,
+          305.6945786223514
+        ]
+      },
+      "properties": {
+        "building_id": 1,
+        "outstop_x": 343.8208803165648,
+        "outstop_y": 307.47720982509514,
+        "graph_id": "154"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          353.9684837638051,
+          291.7905885480577
+        ]
+      },
+      "properties": {
+        "building_id": 2,
+        "outstop_x": 357.1546665875472,
+        "outstop_y": 285.31300247454834,
+        "graph_id": "155"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          401.36280054511735,
+          299.5716960133286
+        ]
+      },
+      "properties": {
+        "building_id": 2,
+        "outstop_x": 393.8694139130151,
+        "outstop_y": 295.6617305752328,
+        "graph_id": "156"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          345.0179122259142,
+          341.7112129043089
+        ]
+      },
+      "properties": {
+        "building_id": 1,
+        "outstop_x": 342.6102121643344,
+        "outstop_y": 347.79552980026574,
+        "graph_id": "157"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          350.91205419867765,
+          258.75669253780507
+        ]
+      },
+      "properties": {
+        "building_id": 2,
+        "outstop_x": 342.79908117399214,
+        "outstop_y": 254.42403197017055,
+        "graph_id": "158"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          392.2504912474542,
+          255.45209334627725
+        ]
+      },
+      "properties": {
+        "building_id": 2,
+        "outstop_x": 397.52084664782353,
+        "outstop_y": 255.27587091996014,
+        "graph_id": "159"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          298.4535759110586,
+          252.1686939606443
+        ]
+      },
+      "properties": {
+        "building_id": 4,
+        "outstop_x": 291.490726331499,
+        "outstop_y": 248.70588166042378,
+        "graph_id": "160"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          303.6036760667339,
+          211.91917857842054
+        ]
+      },
+      "properties": {
+        "building_id": 3,
+        "outstop_x": 300.6418952588486,
+        "outstop_y": 218.04351779466646,
+        "graph_id": "161"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          304.4733337952639,
+          164.10148128808942
+        ]
+      },
+      "properties": {
+        "building_id": 5,
+        "outstop_x": 302.28957788956916,
+        "outstop_y": 169.85305802594053,
+        "graph_id": "162"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          354.6269027252565,
+          156.37992423214018
+        ]
+      },
+      "properties": {
+        "building_id": 5,
+        "outstop_x": 359.7773182341365,
+        "outstop_y": 162.31472689105794,
+        "graph_id": "163"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          323.0953253462794,
+          108.67210357368458
+        ]
+      },
+      "properties": {
+        "building_id": 5,
+        "outstop_x": 327.9736388706715,
+        "outstop_y": 102.88289056797707,
+        "graph_id": "164"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          428.9574636219186,
+          179.9952767083887
+        ]
+      },
+      "properties": {
+        "building_id": 6,
+        "outstop_x": 422.22156351662306,
+        "outstop_y": 177.08195523584533,
+        "graph_id": "165"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          446.408630614751,
+          86.77798623091076
+        ]
+      },
+      "properties": {
+        "building_id": 8,
+        "outstop_x": 440.29872409995073,
+        "outstop_y": 83.32677861056156,
+        "graph_id": "166"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          510.3985123268794,
+          84.81714213802479
+        ]
+      },
+      "properties": {
+        "building_id": 9,
+        "outstop_x": 504.37768131646135,
+        "outstop_y": 81.78002458655402,
+        "graph_id": "167"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          498.0499451534706,
+          60.32894980232231
+        ]
+      },
+      "properties": {
+        "building_id": 9,
+        "outstop_x": 492.57591876677316,
+        "outstop_y": 56.46491695947961,
+        "graph_id": "168"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          464.5676353677991,
+          181.44775559054688
+        ]
+      },
+      "properties": {
+        "building_id": 6,
+        "outstop_x": 467.10591764955325,
+        "outstop_y": 175.63250698988432,
+        "graph_id": "169"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          205.3926231203368,
+          473.3230713866651
+        ]
+      },
+      "properties": {
+        "building_id": 10,
+        "outstop_x": 201.6939657277938,
+        "outstop_y": 480.98664710944485,
+        "graph_id": "170"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          522.3031556424103,
+          69.4369828918716
+        ]
+      },
+      "properties": {
+        "building_id": 9,
+        "outstop_x": 530.450528216292,
+        "outstop_y": 71.98443405190176,
+        "graph_id": "171"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          472.67016177950427,
+          80.74594055325724
+        ]
+      },
+      "properties": {
+        "building_id": 8,
+        "outstop_x": 475.55597572432697,
+        "outstop_y": 73.85970905480545,
+        "graph_id": "172"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          465.6336059640744,
+          112.35357751732226
+        ]
+      },
+      "properties": {
+        "building_id": 8,
+        "outstop_x": 463.2850705938743,
+        "outstop_y": 120.87421178081564,
+        "graph_id": "173"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          490.44805340783205,
+          138.1636505187489
+        ]
+      },
+      "properties": {
+        "building_id": 7,
+        "outstop_x": 499.50214521380525,
+        "outstop_y": 141.85426253069346,
+        "graph_id": "174"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          264.11259276862256,
+          268.03594156866893
+        ]
+      },
+      "properties": {
+        "building_id": 0,
+        "outstop_x": 268.77282880204893,
+        "outstop_y": 259.40858511767476,
+        "graph_id": "175"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          162.1306690305937,
+          454.11008779122494
+        ]
+      },
+      "properties": {
+        "building_id": 10,
+        "outstop_x": 155.34917026198454,
+        "outstop_y": 454.3084283513116,
+        "graph_id": "176"
+      }
+    }
+  ]
+}
