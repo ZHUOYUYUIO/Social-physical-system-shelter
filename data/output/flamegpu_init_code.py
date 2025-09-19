@@ -63,12 +63,12 @@ def initialize_student_agent_population(model, cuda_model, population_file='data
         print(f"❌ 加载人口数据失败: {e}")
     
     # 读取楼梯间数据并创建楼梯间代理
-    stairwell_file = 'data/output/transformed_stairwell.geojson'
+    stairwell_file = 'data/output/stairwell_withoutput_new.geojson'
     if not os.path.exists(stairwell_file):
         print(f"❌ 找不到楼梯间数据文件: {stairwell_file}")
         return
     
-    try:
+    try: 
         with open(stairwell_file, 'r', encoding='utf-8') as f:
             stairwell_data = json.load(f)
         
@@ -89,9 +89,12 @@ def initialize_student_agent_population(model, cuda_model, population_file='data
             stairwell_agent.setVariableFloat("y", coordinates[1])
             stairwell_agent.setVariableInt("stairwell_id", i)
             stairwell_agent.setVariableInt("building_id", feature['properties']['building_id'])
+            stairwell_agent.setVariableFloat("outstop_x", feature['properties']['outstop_x'])
+            stairwell_agent.setVariableFloat("outstop_y", feature['properties']['outstop_y'])
+            stairwell_agent.setVariableInt("graph_id", feature['properties']['graph_id'])
 
             stairwell_agent.setVariableFloat("z", 0.0)  # 楼层高度
-
+ 
         cuda_model.setPopulationData(stairwellAgentPopulation)
         print("楼梯间代理种群初始化完成")
 

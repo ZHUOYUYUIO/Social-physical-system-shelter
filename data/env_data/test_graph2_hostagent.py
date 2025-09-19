@@ -2,6 +2,7 @@ from pyflamegpu import *
 import pyflamegpu.codegen
 import sys
 import math
+import random
 
 model = pyflamegpu.ModelDescription("F_MAP_tutorial")
 
@@ -13,6 +14,12 @@ class directed_graph_hostfn(pyflamegpu.HostFunction):
     fgraph = FLAMEGPU.environment.getDirectedGraph("fgraph")
     # Import a different graph
     fgraph.importGraph("data/env_data/expanded_visibility_graph_renumbered.json");
+
+
+
+
+
+
 
 # Define an agent named point
 agent = model.newAgent("point")
@@ -30,6 +37,9 @@ agent.newVariableInt("start_vertex_id")
 agent.newVariableInt("end_vertex_id")
 agent.newVariableInt("path_length")
 agent.newVariableArrayInt("shortest_path", 20)  # 存储最短路径的顶点ID数组，16个顶点的图最长路径不超过20
+agent.newVariableInt("path_point", 1)
+agent.newVariableFloat("target_shelter_x")
+agent.newVariableFloat("target_shelter_y")
 
 
 
@@ -193,15 +203,62 @@ def ShortestPathFn(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.M
     return pyflamegpu.ALIVE 
 
 
+@pyflamegpu.agent_function
+def move_to_shelter(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageNone):
+    
+    fgraph = pyflamegpu.environment.getDirectedGraph("fgraph")
+    i = pyflamegpu.getVariableInt("path_point")
+    m = pyflamegpu.getVariableIntArray20("shortest_path", i)
+    #n = pyflamegpu.getVariableIntArray20("shortest_path", i+1)
+    target_shelter_x = fgraph.getVertexPropertyFloatArray2("bar", m,0)
+    target_shelter_y = fgraph.getVertexPropertyFloatArray2("bar", m,1)
+
+    pyflamegpu.setVariableFloat("target_shelter_x", target_shelter_x)
+    pyflamegpu.setVariableFloat("target_shelter_y", target_shelter_y)
+
+    return pyflamegpu.ALIVE
+
+
 #ExampleFn_translated = pyflamegpu.codegen.translate(ExampleFn)
 ShortestPathFn_translated = pyflamegpu.codegen.translate(ShortestPathFn)
 #ExampleFn_fn = agent.newRTCFunction("ExampleFn",ExampleFn_translated)
 ShortestPathFn_fn = agent.newRTCFunction("ShortestPathFn",ShortestPathFn_translated)
 
+move_to_shelter_translated = pyflamegpu.codegen.translate(move_to_shelter)
+move_to_shelter_fn = agent.newRTCFunction("move_to_shelter", move_to_shelter_translated)
+
 model.addInitFunction(directed_graph_hostfn())
 #model.addExecutionRoot(ExampleFn_fn)
 model.addExecutionRoot(ShortestPathFn_fn)
-model.generateLayers()
+move_to_shelter_fn.dependsOn(ShortestPathFn_fn)
+
+
+model.generateLayers() 
+
+class CreateNewPoint(pyflamegpu.HostFunction): 
+  def run(self,FLAMEGPU):
+    # Retrieve the host agent tools for agent sheep in the default state
+    point = FLAMEGPU.agent("point");
+
+    # Create 10 new 'sheep' agents
+    for i in range(3):
+        agent = point.newAgent()
+        agent.setVariableFloat("x", random.uniform(0, ENV_WIDTH))
+        agent.setVariableFloat("y", random.uniform(0, ENV_WIDTH))
+
+        # 设置起点和终点ID（示例中使用固定值，您可以根据需要修改）
+        if i == 0:
+            agent.setVariableInt("start_vertex_id", 1)  # 从顶点1开始
+            agent.setVariableInt("end_vertex_id", 10)   # 到顶点10结束
+        elif i == 1:
+            agent.setVariableInt("start_vertex_id", 139)  # 从顶点2开始
+            agent.setVariableInt("end_vertex_id", 176)   # 到顶点15结束
+        else:
+            agent.setVariableInt("start_vertex_id", 131)  # 从顶点5开始
+            agent.setVariableInt("end_vertex_id", 164)   # 到顶点20结束  
+
+model.addInitFunction(CreateNewPoint())
+
 
 # Specify the desired StepLoggingConfig
 step_log_cfg = pyflamegpu.StepLoggingConfig(model)
@@ -216,24 +273,7 @@ cuda_model = pyflamegpu.CUDASimulation(model)
 import random
 AGENT_COUNT=3
 ENV_WIDTH=2
-AgentPopulation = pyflamegpu.AgentVector(model.Agent("point"), AGENT_COUNT)
-for i in range(AGENT_COUNT):
-    agent = AgentPopulation[i]
-    agent.setVariableFloat("x", random.uniform(0, ENV_WIDTH))
-    agent.setVariableFloat("y", random.uniform(0, ENV_WIDTH))
 
-    # 设置起点和终点ID（示例中使用固定值，您可以根据需要修改）
-    if i == 0:
-        agent.setVariableInt("start_vertex_id", 1)  # 从顶点1开始
-        agent.setVariableInt("end_vertex_id", 10)   # 到顶点10结束
-    elif i == 1:
-        agent.setVariableInt("start_vertex_id", 139)  # 从顶点2开始
-        agent.setVariableInt("end_vertex_id", 176)   # 到顶点15结束
-    else:
-        agent.setVariableInt("start_vertex_id", 125)  # 从顶点5开始
-        agent.setVariableInt("end_vertex_id", 133)   # 到顶点20结束
-
-cuda_model.setPopulationData(AgentPopulation)
 
 cuda_model.initialise(sys.argv)
 
@@ -255,6 +295,9 @@ for agent in out_pop:
     print("  destination index value: %d"%(agent.getVariableInt("destination_index")))
     print("  edge index value: %d"%(agent.getVariableInt("edge_index")))
     print("  bar_0_0 value: %f"%(agent.getVariableFloat("bar_0_0")))
+    print("  target_shelter_x value: %f"%(agent.getVariableFloat("target_shelter_x")))
+    print("  target_shelter_y value: %f"%(agent.getVariableFloat("target_shelter_y")))
+
 
     # 显示最短路径信息
     start_id = agent.getVariableInt("start_vertex_id")

@@ -14,7 +14,7 @@
         "building_id": 11,
         "outstop_x": 194.41173469143112,
         "outstop_y": 422.26116605468803,
-        "graph_id": "149"
+        "graph_id": 149
       }
     },
     {
@@ -30,7 +30,7 @@
         "building_id": 11,
         "outstop_x": 193.13693932701278,
         "outstop_y": 402.8913352175176,
-        "graph_id": "150"
+        "graph_id": 150
       }
     },
     {
@@ -46,7 +46,7 @@
         "building_id": 12,
         "outstop_x": 295.43180987053796,
         "outstop_y": 506.95780795384195,
-        "graph_id": "151"
+        "graph_id": 151
       }
     },
     {
@@ -62,7 +62,7 @@
         "building_id": 13,
         "outstop_x": 270.22600721460566,
         "outstop_y": 487.05522969232345,
-        "graph_id": "152"
+        "graph_id": 152
       }
     },
     {
@@ -78,7 +78,7 @@
         "building_id": 13,
         "outstop_x": 312.69832556978713,
         "outstop_y": 444.86895862826276,
-        "graph_id": "153"
+        "graph_id": 153
       }
     },
     {
@@ -94,7 +94,7 @@
         "building_id": 1,
         "outstop_x": 343.8208803165648,
         "outstop_y": 307.47720982509514,
-        "graph_id": "154"
+        "graph_id": 154
       }
     },
     {
@@ -110,7 +110,7 @@
         "building_id": 2,
         "outstop_x": 357.1546665875472,
         "outstop_y": 285.31300247454834,
-        "graph_id": "155"
+        "graph_id": 155
       }
     },
     {
@@ -126,7 +126,7 @@
         "building_id": 2,
         "outstop_x": 393.8694139130151,
         "outstop_y": 295.6617305752328,
-        "graph_id": "156"
+        "graph_id": 156
       }
     },
     {
@@ -142,7 +142,7 @@
         "building_id": 1,
         "outstop_x": 342.6102121643344,
         "outstop_y": 347.79552980026574,
-        "graph_id": "157"
+        "graph_id": 157
       }
     },
     {
@@ -158,7 +158,7 @@
         "building_id": 2,
         "outstop_x": 342.79908117399214,
         "outstop_y": 254.42403197017055,
-        "graph_id": "158"
+        "graph_id": 158
       }
     },
     {
@@ -174,7 +174,7 @@
         "building_id": 2,
         "outstop_x": 397.52084664782353,
         "outstop_y": 255.27587091996014,
-        "graph_id": "159"
+        "graph_id": 159
       }
     },
     {
@@ -190,7 +190,7 @@
         "building_id": 4,
         "outstop_x": 291.490726331499,
         "outstop_y": 248.70588166042378,
-        "graph_id": "160"
+        "graph_id": 160
       }
     },
     {
@@ -206,7 +206,7 @@
         "building_id": 3,
         "outstop_x": 300.6418952588486,
         "outstop_y": 218.04351779466646,
-        "graph_id": "161"
+        "graph_id": 161
       }
     },
     {
@@ -222,7 +222,7 @@
         "building_id": 5,
         "outstop_x": 302.28957788956916,
         "outstop_y": 169.85305802594053,
-        "graph_id": "162"
+        "graph_id": 162
       }
     },
     {
@@ -238,7 +238,7 @@
         "building_id": 5,
         "outstop_x": 359.7773182341365,
         "outstop_y": 162.31472689105794,
-        "graph_id": "163"
+        "graph_id": 163
       }
     },
     {
@@ -254,7 +254,7 @@
         "building_id": 5,
         "outstop_x": 327.9736388706715,
         "outstop_y": 102.88289056797707,
-        "graph_id": "164"
+        "graph_id": 164
       }
     },
     {
@@ -270,7 +270,7 @@
         "building_id": 6,
         "outstop_x": 422.22156351662306,
         "outstop_y": 177.08195523584533,
-        "graph_id": "165"
+        "graph_id": 165
       }
     },
     {
@@ -286,7 +286,7 @@
         "building_id": 8,
         "outstop_x": 440.29872409995073,
         "outstop_y": 83.32677861056156,
-        "graph_id": "166"
+        "graph_id": 166
       }
     },
     {
@@ -302,7 +302,7 @@
         "building_id": 9,
         "outstop_x": 504.37768131646135,
         "outstop_y": 81.78002458655402,
-        "graph_id": "167"
+        "graph_id": 167
       }
     },
     {
@@ -318,7 +318,7 @@
         "building_id": 9,
         "outstop_x": 492.57591876677316,
         "outstop_y": 56.46491695947961,
-        "graph_id": "168"
+        "graph_id": 168
       }
     },
     {
@@ -334,7 +334,7 @@
         "building_id": 6,
         "outstop_x": 467.10591764955325,
         "outstop_y": 175.63250698988432,
-        "graph_id": "169"
+        "graph_id": 169
       }
     },
     {
@@ -350,7 +350,7 @@
         "building_id": 10,
         "outstop_x": 201.6939657277938,
         "outstop_y": 480.98664710944485,
-        "graph_id": "170"
+        "graph_id": 170
       }
     },
     {
@@ -366,7 +366,7 @@
         "building_id": 9,
         "outstop_x": 530.450528216292,
         "outstop_y": 71.98443405190176,
-        "graph_id": "171"
+        "graph_id": 171
       }
     },
     {
@@ -382,7 +382,7 @@
         "building_id": 8,
         "outstop_x": 475.55597572432697,
         "outstop_y": 73.85970905480545,
-        "graph_id": "172"
+        "graph_id": 172
       }
     },
     {
@@ -398,7 +398,7 @@
         "building_id": 8,
         "outstop_x": 463.2850705938743,
         "outstop_y": 120.87421178081564,
-        "graph_id": "173"
+        "graph_id": 173
       }
     },
     {
@@ -414,7 +414,7 @@
         "building_id": 7,
         "outstop_x": 499.50214521380525,
         "outstop_y": 141.85426253069346,
-        "graph_id": "174"
+        "graph_id": 174
       }
     },
     {
@@ -430,7 +430,7 @@
         "building_id": 0,
         "outstop_x": 268.77282880204893,
         "outstop_y": 259.40858511767476,
-        "graph_id": "175"
+        "graph_id": 175
       }
     },
     {
@@ -446,7 +446,7 @@
         "building_id": 10,
         "outstop_x": 155.34917026198454,
         "outstop_y": 454.3084283513116,
-        "graph_id": "176"
+        "graph_id": 176
       }
     }
   ]

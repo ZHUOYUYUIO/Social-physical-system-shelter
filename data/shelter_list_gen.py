@@ -57,7 +57,7 @@ FlameGPU shelter代理初始化代码
 
 from pyflamegpu import *
 
-def initialize_shelter_agent_population(model, cuda_model, index_vector, shelter_csv_path='data/output/shelter_points.csv'):
+def initialize_shelter_agent_population(model, cuda_model, index_vector, shelter_csv_path='data/output/shelter_points_withoutput_new.csv'):
     """
     初始化shelter代理种群
     index_vector: shelter点的索引列表（如 [3, 7, 12, ...]）
@@ -89,6 +89,7 @@ def initialize_shelter_agent_population(model, cuda_model, index_vector, shelter
         shelter_agent.setVariableFloat("x", pt['x'])
         shelter_agent.setVariableFloat("y", pt['y'])
         shelter_agent.setVariableInt("shelter_id", pt['index'])
+        shelter_agent.setVariableInt("graph_id", pt['graph_id'])
         shelter_agent.setVariableFloat("z", 0.0)
 
     cuda_model.setPopulationData(shelterAgentPopulation)

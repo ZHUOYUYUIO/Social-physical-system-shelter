@@ -134,6 +134,9 @@ def initialize_student_agent_population(model, cuda_model, population_file='data
             stairwell_agent.setVariableFloat("y", coordinates[1])
             stairwell_agent.setVariableInt("stairwell_id", i)
             stairwell_agent.setVariableInt("building_id", feature['properties']['building_id'])
+            stairwell_agent.setVariableFloat("outstop_x", feature['properties']['outstop_x'])
+            stairwell_agent.setVariableFloat("outstop_y", feature['properties']['outstop_y'])
+            stairwell_agent.setVariableInt("graph_id", feature['properties']['graph_id'])
 
             stairwell_agent.setVariableFloat("z", 0.0)  # 楼层高度
 

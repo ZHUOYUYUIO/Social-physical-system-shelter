@@ -10,8 +10,8 @@ def load_graph_nodes(graph_json_path: str) -> List[Dict[str, Any]]:
     return data.get("nodes", [])
 
 
-def build_bar_lookup_by_int_round(nodes: List[Dict[str, Any]]) -> Dict[Tuple[int, int], str]:
-    lookup: Dict[Tuple[int, int], str] = {}
+def build_bar_lookup_by_int_round(nodes: List[Dict[str, Any]]) -> Dict[Tuple[int, int], int]:
+    lookup: Dict[Tuple[int, int], int] = {}
     for n in nodes:
         bar = n.get("bar")
         if not bar or not isinstance(bar, list) or len(bar) < 2:
@@ -21,7 +21,11 @@ def build_bar_lookup_by_int_round(nodes: List[Dict[str, Any]]) -> Dict[Tuple[int
             by = int(round(float(bar[1])))
         except Exception:
             continue
-        lookup[(bx, by)] = str(n.get("id"))
+        try:
+            node_id = int(n.get("id"))
+        except Exception:
+            continue
+        lookup[(bx, by)] = node_id
     return lookup
 
 
@@ -29,8 +33,8 @@ def compute_squared_distance(ax: float, ay: float, bx: float, by: float) -> floa
     return (ax - bx) * (ax - bx) + (ay - by) * (ay - by)
 
 
-def find_nearest_graph_id(px: float, py: float, nodes: List[Dict[str, Any]]) -> Tuple[Optional[str], float]:
-    best_id: Optional[str] = None
+def find_nearest_graph_id(px: float, py: float, nodes: List[Dict[str, Any]]) -> Tuple[Optional[int], float]:
+    best_id: Optional[int] = None
     best_d2: float = float("inf")
     for n in nodes:
         bar = n.get("bar")
@@ -44,7 +48,10 @@ def find_nearest_graph_id(px: float, py: float, nodes: List[Dict[str, Any]]) -> 
         d2 = compute_squared_distance(px, py, nx, ny)
         if d2 < best_d2:
             best_d2 = d2
-            best_id = str(n.get("id"))
+            try:
+                best_id = int(n.get("id"))
+            except Exception:
+                best_id = None
     return best_id, math.sqrt(best_d2) if best_d2 < float("inf") else float("inf")
 
 
@@ -80,7 +87,7 @@ def process(
         props = dict(feat.get("properties", {}))
         ox = props.get("outstop_x")
         oy = props.get("outstop_y")
-        graph_id: Optional[str] = None
+        graph_id: Optional[int] = None
 
         if ox is not None and oy is not None:
             try:
@@ -92,10 +99,11 @@ def process(
 
             if oxf is not None and oyf is not None:
                 nid, _ = find_nearest_graph_id(oxf, oyf, nodes)
-                graph_id = nid if nid is not None else ""
+                graph_id = nid if nid is not None else None
                 processed_cnt += 1
 
-        props["graph_id"] = graph_id if graph_id is not None else ""
+        # graph_id写入数字，如果没有则写入None（会变成null），否则写入int
+        props["graph_id"] = graph_id if graph_id is not None else None
 
         updated_features.append(
             {
@@ -142,5 +150,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
 
