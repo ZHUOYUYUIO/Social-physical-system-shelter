@@ -251,11 +251,11 @@ class CreateNewPoint(pyflamegpu.HostFunction):
             agent.setVariableInt("start_vertex_id", 1)  # 从顶点1开始
             agent.setVariableInt("end_vertex_id", 10)   # 到顶点10结束
         elif i == 1:
-            agent.setVariableInt("start_vertex_id", 139)  # 从顶点2开始
-            agent.setVariableInt("end_vertex_id", 176)   # 到顶点15结束
+            agent.setVariableInt("start_vertex_id", 128)  # 从顶点2开始
+            agent.setVariableInt("end_vertex_id", 173)   # 到顶点15结束
         else:
             agent.setVariableInt("start_vertex_id", 131)  # 从顶点5开始
-            agent.setVariableInt("end_vertex_id", 164)   # 到顶点20结束  
+            agent.setVariableInt("end_vertex_id", 176)   # 到顶点20结束  
 
 model.addInitFunction(CreateNewPoint())
 
@@ -276,7 +276,7 @@ ENV_WIDTH=2
 
 
 cuda_model.initialise(sys.argv)
-
+ 
 # Attach the logging config 
 cuda_model.setStepLog(step_log_cfg)
 

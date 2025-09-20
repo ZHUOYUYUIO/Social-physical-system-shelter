@@ -221,7 +221,7 @@ for i in range(AGENT_COUNT):
     agent = AgentPopulation[i]
     agent.setVariableFloat("x", random.uniform(0, ENV_WIDTH))
     agent.setVariableFloat("y", random.uniform(0, ENV_WIDTH))
-
+ 
     # 设置起点和终点ID（示例中使用固定值，您可以根据需要修改）
     if i == 0:
         agent.setVariableInt("start_vertex_id", 1)  # 从顶点1开始
