@@ -659,7 +659,7 @@ def main():
     # 执行转换
     result = transformer.process_community_data(
         'sample_data/sample_boundary.shp',
-        'sample_data/sample_buildings.shp',
+        'sample_data/sample_buildings.shp', 
         'sample_data/sample_stairwell.geojson',
         'sample_data/sample_shelter_available.geojson',
         'sample_data/sample_familiar_point.geojson'

@@ -1,0 +1,967 @@
+{
+  "tutor_agents": [
+    {
+      "tutor_id": 0,
+      "building_id": 0,
+      "floor": 1,
+      "x": 240.7667601507961,
+      "y": 265.3081411991041,
+      "source_point_id": 225,
+      "source_floor": 1
+    },
+    {
+      "tutor_id": 1,
+      "building_id": 0,
+      "floor": 2,
+      "x": 240.5642467958958,
+      "y": 265.2995080968067,
+      "source_point_id": 241,
+      "source_floor": 2
+    },
+    {
+      "tutor_id": 2,
+      "building_id": 0,
+      "floor": 3,
+      "x": 243.73399663337514,
+      "y": 266.2589904076193,
+      "source_point_id": 72,
+      "source_floor": 3
+    },
+    {
+      "tutor_id": 3,
+      "building_id": 0,
+      "floor": 4,
+      "x": 242.58221359603513,
+      "y": 271.0346917725664,
+      "source_point_id": 149,
+      "source_floor": 4
+    },
+    {
+      "tutor_id": 4,
+      "building_id": 0,
+      "floor": 5,
+      "x": 246.73938831001135,
+      "y": 273.5720157518086,
+      "source_point_id": 269,
+      "source_floor": 5
+    },
+    {
+      "tutor_id": 5,
+      "building_id": 0,
+      "floor": 6,
+      "x": 240.9515435133063,
+      "y": 264.4085089657798,
+      "source_point_id": 231,
+      "source_floor": 6
+    },
+    {
+      "tutor_id": 6,
+      "building_id": 1,
+      "floor": 1,
+      "x": 334.74187420252895,
+      "y": 327.1697364531105,
+      "source_point_id": 83,
+      "source_floor": 1
+    },
+    {
+      "tutor_id": 7,
+      "building_id": 1,
+      "floor": 2,
+      "x": 331.8193166180112,
+      "y": 322.4380241395786,
+      "source_point_id": 20,
+      "source_floor": 2
+    },
+    {
+      "tutor_id": 8,
+      "building_id": 1,
+      "floor": 3,
+      "x": 332.91297118276066,
+      "y": 326.02578895079836,
+      "source_point_id": 280,
+      "source_floor": 3
+    },
+    {
+      "tutor_id": 9,
+      "building_id": 1,
+      "floor": 4,
+      "x": 333.8447153548267,
+      "y": 324.39393454371276,
+      "source_point_id": 145,
+      "source_floor": 4
+    },
+    {
+      "tutor_id": 10,
+      "building_id": 1,
+      "floor": 5,
+      "x": 333.84345006586824,
+      "y": 322.1849107165866,
+      "source_point_id": 92,
+      "source_floor": 5
+    },
+    {
+      "tutor_id": 11,
+      "building_id": 1,
+      "floor": 6,
+      "x": 334.7825545732108,
+      "y": 325.112061885495,
+      "source_point_id": 1,
+      "source_floor": 6
+    },
+    {
+      "tutor_id": 12,
+      "building_id": 1,
+      "floor": 7,
+      "x": 337.13128231875737,
+      "y": 325.50298054366027,
+      "source_point_id": 248,
+      "source_floor": 7
+    },
+    {
+      "tutor_id": 13,
+      "building_id": 2,
+      "floor": 1,
+      "x": 384.3896158747166,
+      "y": 272.31765488412924,
+      "source_point_id": 211,
+      "source_floor": 1
+    },
+    {
+      "tutor_id": 14,
+      "building_id": 2,
+      "floor": 2,
+      "x": 385.83593268689907,
+      "y": 274.89481468686,
+      "source_point_id": 183,
+      "source_floor": 2
+    },
+    {
+      "tutor_id": 15,
+      "building_id": 2,
+      "floor": 3,
+      "x": 398.2576311914217,
+      "y": 279.214239598667,
+      "source_point_id": 184,
+      "source_floor": 3
+    },
+    {
+      "tutor_id": 16,
+      "building_id": 2,
+      "floor": 4,
+      "x": 386.1822722647119,
+      "y": 277.9896331690226,
+      "source_point_id": 177,
+      "source_floor": 4
+    },
+    {
+      "tutor_id": 17,
+      "building_id": 2,
+      "floor": 5,
+      "x": 382.2672540367928,
+      "y": 269.315470899713,
+      "source_point_id": 258,
+      "source_floor": 5
+    },
+    {
+      "tutor_id": 18,
+      "building_id": 2,
+      "floor": 6,
+      "x": 393.867890018323,
+      "y": 279.5948390833118,
+      "source_point_id": 212,
+      "source_floor": 6
+    },
+    {
+      "tutor_id": 19,
+      "building_id": 2,
+      "floor": 7,
+      "x": 385.6823190343474,
+      "y": 277.9016346267139,
+      "source_point_id": 288,
+      "source_floor": 7
+    },
+    {
+      "tutor_id": 20,
+      "building_id": 3,
+      "floor": 1,
+      "x": 301.2058584363953,
+      "y": 206.13811425558018,
+      "source_point_id": 100,
+      "source_floor": 1
+    },
+    {
+      "tutor_id": 21,
+      "building_id": 3,
+      "floor": 2,
+      "x": 303.1062980840993,
+      "y": 207.55994937911527,
+      "source_point_id": 4,
+      "source_floor": 2
+    },
+    {
+      "tutor_id": 22,
+      "building_id": 3,
+      "floor": 3,
+      "x": 303.8964653123429,
+      "y": 204.98500457908284,
+      "source_point_id": 147,
+      "source_floor": 3
+    },
+    {
+      "tutor_id": 23,
+      "building_id": 3,
+      "floor": 4,
+      "x": 303.8918345964819,
+      "y": 203.9147649737116,
+      "source_point_id": 370,
+      "source_floor": 4
+    },
+    {
+      "tutor_id": 24,
+      "building_id": 3,
+      "floor": 5,
+      "x": 300.6333901711212,
+      "y": 204.1289119225215,
+      "source_point_id": 344,
+      "source_floor": 5
+    },
+    {
+      "tutor_id": 25,
+      "building_id": 3,
+      "floor": 6,
+      "x": 295.6332194701931,
+      "y": 204.657539632026,
+      "source_point_id": 232,
+      "source_floor": 6
+    },
+    {
+      "tutor_id": 26,
+      "building_id": 3,
+      "floor": 7,
+      "x": 302.4453752736797,
+      "y": 207.28237373913146,
+      "source_point_id": 183,
+      "source_floor": 7
+    },
+    {
+      "tutor_id": 27,
+      "building_id": 4,
+      "floor": 1,
+      "x": 293.43656819557077,
+      "y": 269.04832889796745,
+      "source_point_id": 126,
+      "source_floor": 1
+    },
+    {
+      "tutor_id": 28,
+      "building_id": 4,
+      "floor": 2,
+      "x": 295.57968427005596,
+      "y": 264.86421212846545,
+      "source_point_id": 41,
+      "source_floor": 2
+    },
+    {
+      "tutor_id": 29,
+      "building_id": 4,
+      "floor": 3,
+      "x": 297.1499143648695,
+      "y": 268.0309368181952,
+      "source_point_id": 381,
+      "source_floor": 3
+    },
+    {
+      "tutor_id": 30,
+      "building_id": 4,
+      "floor": 4,
+      "x": 294.3623131593753,
+      "y": 271.49035307798493,
+      "source_point_id": 358,
+      "source_floor": 4
+    },
+    {
+      "tutor_id": 31,
+      "building_id": 4,
+      "floor": 5,
+      "x": 296.75193045707925,
+      "y": 267.57340176302597,
+      "source_point_id": 33,
+      "source_floor": 5
+    },
+    {
+      "tutor_id": 32,
+      "building_id": 4,
+      "floor": 6,
+      "x": 296.4121913944448,
+      "y": 265.432807851015,
+      "source_point_id": 359,
+      "source_floor": 6
+    },
+    {
+      "tutor_id": 33,
+      "building_id": 4,
+      "floor": 7,
+      "x": 295.6028846252938,
+      "y": 267.5096823814513,
+      "source_point_id": 390,
+      "source_floor": 7
+    },
+    {
+      "tutor_id": 34,
+      "building_id": 5,
+      "floor": 1,
+      "x": 320.4996108325982,
+      "y": 124.7662125590584,
+      "source_point_id": 254,
+      "source_floor": 1
+    },
+    {
+      "tutor_id": 35,
+      "building_id": 5,
+      "floor": 2,
+      "x": 310.84445655889164,
+      "y": 149.7879126576268,
+      "source_point_id": 26,
+      "source_floor": 2
+    },
+    {
+      "tutor_id": 36,
+      "building_id": 5,
+      "floor": 3,
+      "x": 314.216555322611,
+      "y": 121.70652983240132,
+      "source_point_id": 7,
+      "source_floor": 3
+    },
+    {
+      "tutor_id": 37,
+      "building_id": 5,
+      "floor": 4,
+      "x": 305.0140341134123,
+      "y": 143.42294454673535,
+      "source_point_id": 236,
+      "source_floor": 4
+    },
+    {
+      "tutor_id": 38,
+      "building_id": 5,
+      "floor": 5,
+      "x": 305.9305252978586,
+      "y": 144.3001650141155,
+      "source_point_id": 28,
+      "source_floor": 5
+    },
+    {
+      "tutor_id": 39,
+      "building_id": 5,
+      "floor": 6,
+      "x": 325.6897930401159,
+      "y": 125.55250014447017,
+      "source_point_id": 132,
+      "source_floor": 6
+    },
+    {
+      "tutor_id": 40,
+      "building_id": 5,
+      "floor": 7,
+      "x": 312.74620731777486,
+      "y": 147.76411728289906,
+      "source_point_id": 200,
+      "source_floor": 7
+    },
+    {
+      "tutor_id": 41,
+      "building_id": 6,
+      "floor": 1,
+      "x": 447.8280328151034,
+      "y": 181.71991090754955,
+      "source_point_id": 72,
+      "source_floor": 1
+    },
+    {
+      "tutor_id": 42,
+      "building_id": 6,
+      "floor": 2,
+      "x": 449.37499498056707,
+      "y": 185.77752877931275,
+      "source_point_id": 382,
+      "source_floor": 2
+    },
+    {
+      "tutor_id": 43,
+      "building_id": 6,
+      "floor": 3,
+      "x": 444.36383546717474,
+      "y": 185.02003089944373,
+      "source_point_id": 76,
+      "source_floor": 3
+    },
+    {
+      "tutor_id": 44,
+      "building_id": 6,
+      "floor": 4,
+      "x": 449.33058874564693,
+      "y": 179.77282826010776,
+      "source_point_id": 290,
+      "source_floor": 4
+    },
+    {
+      "tutor_id": 45,
+      "building_id": 6,
+      "floor": 5,
+      "x": 447.8892839020283,
+      "y": 185.23294847645593,
+      "source_point_id": 197,
+      "source_floor": 5
+    },
+    {
+      "tutor_id": 46,
+      "building_id": 6,
+      "floor": 6,
+      "x": 447.36948354851745,
+      "y": 185.1632093906566,
+      "source_point_id": 340,
+      "source_floor": 6
+    },
+    {
+      "tutor_id": 47,
+      "building_id": 6,
+      "floor": 7,
+      "x": 446.56315681680206,
+      "y": 185.599887545565,
+      "source_point_id": 8,
+      "source_floor": 7
+    },
+    {
+      "tutor_id": 48,
+      "building_id": 7,
+      "floor": 1,
+      "x": 477.88030105553094,
+      "y": 147.92794898124734,
+      "source_point_id": 123,
+      "source_floor": 1
+    },
+    {
+      "tutor_id": 49,
+      "building_id": 7,
+      "floor": 2,
+      "x": 481.0144782120043,
+      "y": 144.79485494368208,
+      "source_point_id": 538,
+      "source_floor": 2
+    },
+    {
+      "tutor_id": 50,
+      "building_id": 7,
+      "floor": 3,
+      "x": 477.29626577754186,
+      "y": 145.99944232582092,
+      "source_point_id": 286,
+      "source_floor": 3
+    },
+    {
+      "tutor_id": 51,
+      "building_id": 7,
+      "floor": 4,
+      "x": 481.4875377726838,
+      "y": 148.78459074535346,
+      "source_point_id": 34,
+      "source_floor": 4
+    },
+    {
+      "tutor_id": 52,
+      "building_id": 7,
+      "floor": 5,
+      "x": 480.84442916506646,
+      "y": 148.1679163113681,
+      "source_point_id": 393,
+      "source_floor": 5
+    },
+    {
+      "tutor_id": 53,
+      "building_id": 7,
+      "floor": 6,
+      "x": 477.8252253135734,
+      "y": 145.13424880897975,
+      "source_point_id": 449,
+      "source_floor": 6
+    },
+    {
+      "tutor_id": 54,
+      "building_id": 7,
+      "floor": 7,
+      "x": 481.86032165871114,
+      "y": 144.1951648904532,
+      "source_point_id": 461,
+      "source_floor": 7
+    },
+    {
+      "tutor_id": 55,
+      "building_id": 8,
+      "floor": 1,
+      "x": 459.5568119712593,
+      "y": 97.02667063234642,
+      "source_point_id": 342,
+      "source_floor": 1
+    },
+    {
+      "tutor_id": 56,
+      "building_id": 8,
+      "floor": 2,
+      "x": 465.49636463806894,
+      "y": 98.9823035437802,
+      "source_point_id": 27,
+      "source_floor": 2
+    },
+    {
+      "tutor_id": 57,
+      "building_id": 8,
+      "floor": 3,
+      "x": 457.9552548080527,
+      "y": 95.09121894964592,
+      "source_point_id": 122,
+      "source_floor": 3
+    },
+    {
+      "tutor_id": 58,
+      "building_id": 8,
+      "floor": 4,
+      "x": 460.02293109350364,
+      "y": 96.65459860982902,
+      "source_point_id": 50,
+      "source_floor": 4
+    },
+    {
+      "tutor_id": 59,
+      "building_id": 8,
+      "floor": 5,
+      "x": 455.8837714248692,
+      "y": 99.9010572338,
+      "source_point_id": 7,
+      "source_floor": 5
+    },
+    {
+      "tutor_id": 60,
+      "building_id": 8,
+      "floor": 6,
+      "x": 460.7666778102844,
+      "y": 100.47910808400196,
+      "source_point_id": 277,
+      "source_floor": 6
+    },
+    {
+      "tutor_id": 61,
+      "building_id": 9,
+      "floor": 1,
+      "x": 513.2712603752735,
+      "y": 81.74046611627125,
+      "source_point_id": 385,
+      "source_floor": 1
+    },
+    {
+      "tutor_id": 62,
+      "building_id": 9,
+      "floor": 2,
+      "x": 505.7137173841936,
+      "y": 90.34792021966678,
+      "source_point_id": 439,
+      "source_floor": 2
+    },
+    {
+      "tutor_id": 63,
+      "building_id": 9,
+      "floor": 3,
+      "x": 506.8951270179417,
+      "y": 90.34872120768371,
+      "source_point_id": 396,
+      "source_floor": 3
+    },
+    {
+      "tutor_id": 64,
+      "building_id": 9,
+      "floor": 4,
+      "x": 509.42857362667485,
+      "y": 84.66042720191366,
+      "source_point_id": 205,
+      "source_floor": 4
+    },
+    {
+      "tutor_id": 65,
+      "building_id": 9,
+      "floor": 5,
+      "x": 508.96460201229854,
+      "y": 85.27148856523915,
+      "source_point_id": 133,
+      "source_floor": 5
+    },
+    {
+      "tutor_id": 66,
+      "building_id": 9,
+      "floor": 6,
+      "x": 511.5850549716698,
+      "y": 79.48575155332308,
+      "source_point_id": 137,
+      "source_floor": 6
+    },
+    {
+      "tutor_id": 67,
+      "building_id": 9,
+      "floor": 7,
+      "x": 510.71097430895924,
+      "y": 83.5788484909033,
+      "source_point_id": 444,
+      "source_floor": 7
+    },
+    {
+      "tutor_id": 68,
+      "building_id": 10,
+      "floor": 1,
+      "x": 189.62551321130476,
+      "y": 461.882165501378,
+      "source_point_id": 464,
+      "source_floor": 1
+    },
+    {
+      "tutor_id": 69,
+      "building_id": 10,
+      "floor": 2,
+      "x": 197.62094625341572,
+      "y": 462.9640713667576,
+      "source_point_id": 135,
+      "source_floor": 2
+    },
+    {
+      "tutor_id": 70,
+      "building_id": 10,
+      "floor": 3,
+      "x": 192.0457526147349,
+      "y": 462.12462074614916,
+      "source_point_id": 196,
+      "source_floor": 3
+    },
+    {
+      "tutor_id": 71,
+      "building_id": 10,
+      "floor": 4,
+      "x": 192.80839185940232,
+      "y": 462.1985475674012,
+      "source_point_id": 281,
+      "source_floor": 4
+    },
+    {
+      "tutor_id": 72,
+      "building_id": 10,
+      "floor": 5,
+      "x": 195.549544099781,
+      "y": 465.40862113150797,
+      "source_point_id": 98,
+      "source_floor": 5
+    },
+    {
+      "tutor_id": 73,
+      "building_id": 10,
+      "floor": 6,
+      "x": 188.26984989662262,
+      "y": 464.04860495511855,
+      "source_point_id": 282,
+      "source_floor": 6
+    },
+    {
+      "tutor_id": 74,
+      "building_id": 10,
+      "floor": 7,
+      "x": 188.89808019854047,
+      "y": 460.5718461455697,
+      "source_point_id": 194,
+      "source_floor": 7
+    },
+    {
+      "tutor_id": 75,
+      "building_id": 10,
+      "floor": 8,
+      "x": 189.01373945717503,
+      "y": 459.82763955575257,
+      "source_point_id": 564,
+      "source_floor": 8
+    },
+    {
+      "tutor_id": 76,
+      "building_id": 10,
+      "floor": 9,
+      "x": 191.41682995980887,
+      "y": 467.71123476409844,
+      "source_point_id": 452,
+      "source_floor": 9
+    },
+    {
+      "tutor_id": 77,
+      "building_id": 10,
+      "floor": 10,
+      "x": 189.2724449485874,
+      "y": 463.5039354549537,
+      "source_point_id": 7,
+      "source_floor": 10
+    },
+    {
+      "tutor_id": 78,
+      "building_id": 10,
+      "floor": 11,
+      "x": 185.74320408964334,
+      "y": 464.9968643719722,
+      "source_point_id": 377,
+      "source_floor": 11
+    },
+    {
+      "tutor_id": 79,
+      "building_id": 10,
+      "floor": 12,
+      "x": 185.6439937508925,
+      "y": 456.5749634333303,
+      "source_point_id": 458,
+      "source_floor": 12
+    },
+    {
+      "tutor_id": 80,
+      "building_id": 10,
+      "floor": 13,
+      "x": 185.38180919503452,
+      "y": 467.1022863279373,
+      "source_point_id": 266,
+      "source_floor": 13
+    },
+    {
+      "tutor_id": 81,
+      "building_id": 11,
+      "floor": 1,
+      "x": 173.2686691766835,
+      "y": 407.6201056213154,
+      "source_point_id": 461,
+      "source_floor": 1
+    },
+    {
+      "tutor_id": 82,
+      "building_id": 11,
+      "floor": 2,
+      "x": 173.6233880018379,
+      "y": 407.5757302650392,
+      "source_point_id": 124,
+      "source_floor": 2
+    },
+    {
+      "tutor_id": 83,
+      "building_id": 11,
+      "floor": 3,
+      "x": 173.69302817323137,
+      "y": 416.5085694647569,
+      "source_point_id": 323,
+      "source_floor": 3
+    },
+    {
+      "tutor_id": 84,
+      "building_id": 11,
+      "floor": 4,
+      "x": 166.84711233067347,
+      "y": 404.2603858411031,
+      "source_point_id": 128,
+      "source_floor": 4
+    },
+    {
+      "tutor_id": 85,
+      "building_id": 11,
+      "floor": 5,
+      "x": 169.87078113577533,
+      "y": 404.8154832636695,
+      "source_point_id": 39,
+      "source_floor": 5
+    },
+    {
+      "tutor_id": 86,
+      "building_id": 11,
+      "floor": 6,
+      "x": 173.71137834802605,
+      "y": 410.05175112879675,
+      "source_point_id": 390,
+      "source_floor": 6
+    },
+    {
+      "tutor_id": 87,
+      "building_id": 11,
+      "floor": 7,
+      "x": 174.002824055791,
+      "y": 409.81545692271266,
+      "source_point_id": 78,
+      "source_floor": 7
+    },
+    {
+      "tutor_id": 88,
+      "building_id": 12,
+      "floor": 1,
+      "x": 277.2440950657333,
+      "y": 517.5108930107482,
+      "source_point_id": 329,
+      "source_floor": 1
+    },
+    {
+      "tutor_id": 89,
+      "building_id": 12,
+      "floor": 2,
+      "x": 278.75181550320576,
+      "y": 512.4209011742987,
+      "source_point_id": 204,
+      "source_floor": 2
+    },
+    {
+      "tutor_id": 90,
+      "building_id": 12,
+      "floor": 3,
+      "x": 274.2592412485516,
+      "y": 513.1192516617948,
+      "source_point_id": 387,
+      "source_floor": 3
+    },
+    {
+      "tutor_id": 91,
+      "building_id": 12,
+      "floor": 4,
+      "x": 283.2226944787382,
+      "y": 515.9738480888899,
+      "source_point_id": 347,
+      "source_floor": 4
+    },
+    {
+      "tutor_id": 92,
+      "building_id": 12,
+      "floor": 5,
+      "x": 276.2189840640785,
+      "y": 512.7266186663869,
+      "source_point_id": 96,
+      "source_floor": 5
+    },
+    {
+      "tutor_id": 93,
+      "building_id": 12,
+      "floor": 6,
+      "x": 279.0891777172045,
+      "y": 518.8501085318888,
+      "source_point_id": 102,
+      "source_floor": 6
+    },
+    {
+      "tutor_id": 94,
+      "building_id": 12,
+      "floor": 7,
+      "x": 278.0611053664254,
+      "y": 514.1614128671147,
+      "source_point_id": 462,
+      "source_floor": 7
+    },
+    {
+      "tutor_id": 95,
+      "building_id": 12,
+      "floor": 8,
+      "x": 278.096336900634,
+      "y": 516.132421138102,
+      "source_point_id": 241,
+      "source_floor": 8
+    },
+    {
+      "tutor_id": 96,
+      "building_id": 12,
+      "floor": 9,
+      "x": 274.97074496933993,
+      "y": 516.3415460762193,
+      "source_point_id": 31,
+      "source_floor": 9
+    },
+    {
+      "tutor_id": 97,
+      "building_id": 12,
+      "floor": 10,
+      "x": 283.3948125451468,
+      "y": 513.3726324790888,
+      "source_point_id": 124,
+      "source_floor": 10
+    },
+    {
+      "tutor_id": 98,
+      "building_id": 12,
+      "floor": 11,
+      "x": 277.04430773200886,
+      "y": 516.5865031045156,
+      "source_point_id": 235,
+      "source_floor": 11
+    },
+    {
+      "tutor_id": 99,
+      "building_id": 12,
+      "floor": 12,
+      "x": 276.8407915153322,
+      "y": 513.7910853845791,
+      "source_point_id": 258,
+      "source_floor": 12
+    },
+    {
+      "tutor_id": 100,
+      "building_id": 13,
+      "floor": 1,
+      "x": 291.05427078925317,
+      "y": 468.3581075860497,
+      "source_point_id": 27,
+      "source_floor": 1
+    },
+    {
+      "tutor_id": 101,
+      "building_id": 13,
+      "floor": 2,
+      "x": 291.5284837210479,
+      "y": 462.11332465272324,
+      "source_point_id": 28,
+      "source_floor": 2
+    },
+    {
+      "tutor_id": 102,
+      "building_id": 13,
+      "floor": 3,
+      "x": 292.3809290853402,
+      "y": 463.10639166277144,
+      "source_point_id": 25,
+      "source_floor": 3
+    },
+    {
+      "tutor_id": 103,
+      "building_id": 13,
+      "floor": 4,
+      "x": 290.87514177015566,
+      "y": 461.37915658624337,
+      "source_point_id": 419,
+      "source_floor": 4
+    },
+    {
+      "tutor_id": 104,
+      "building_id": 13,
+      "floor": 5,
+      "x": 289.7603477280455,
+      "y": 457.7939303222597,
+      "source_point_id": 187,
+      "source_floor": 5
+    },
+    {
+      "tutor_id": 105,
+      "building_id": 13,
+      "floor": 6,
+      "x": 296.1732783210612,
+      "y": 464.40563577102887,
+      "source_point_id": 21,
+      "source_floor": 6
+    },
+    {
+      "tutor_id": 106,
+      "building_id": 13,
+      "floor": 7,
+      "x": 289.8915122645316,
+      "y": 459.62514634870575,
+      "source_point_id": 450,
+      "source_floor": 7
+    }
+  ]
+}
