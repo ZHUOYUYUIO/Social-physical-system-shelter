@@ -224,11 +224,11 @@ for i in range(AGENT_COUNT):
  
     # 设置起点和终点ID（示例中使用固定值，您可以根据需要修改）
     if i == 0:
-        agent.setVariableInt("start_vertex_id", 1)  # 从顶点1开始
-        agent.setVariableInt("end_vertex_id", 10)   # 到顶点10结束
+        agent.setVariableInt("start_vertex_id", 24)  # 从顶点1开始
+        agent.setVariableInt("end_vertex_id", 0)   # 到顶点10结束
     elif i == 1:
-        agent.setVariableInt("start_vertex_id", 139)  # 从顶点2开始
-        agent.setVariableInt("end_vertex_id", 176)   # 到顶点15结束
+        agent.setVariableInt("start_vertex_id", 0)  # 从顶点2开始
+        agent.setVariableInt("end_vertex_id", 136)   # 到顶点15结束
     else:
         agent.setVariableInt("start_vertex_id", 125)  # 从顶点5开始
         agent.setVariableInt("end_vertex_id", 133)   # 到顶点20结束

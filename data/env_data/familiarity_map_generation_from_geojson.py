@@ -142,21 +142,27 @@ if __name__ == "__main__":
     
     # 获取脚本所在目录
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(script_dir)  # 从 data/env_data 回到项目根目录
+    # 从 data/env_data 回到项目根目录：env_data -> data -> 项目根目录
+    project_root = os.path.dirname(os.path.dirname(script_dir))
     
-    # 读取 transformed_familiar_point.geojson 文件
-    geojson_path = os.path.join(project_root, "output", "transformed_familiar_point.geojson")
+    # 读取 gmm_centers.geojson 文件（使用绝对路径）
+    geojson_path = os.path.abspath(os.path.join(project_root, "data_empirical", "gmm_centers.geojson"))
+    print(f"gmm_centers.geojson 绝对路径: {geojson_path}")
     
+    # 先检查输入文件是否存在，避免后续误报
+    if not os.path.exists(geojson_path):
+        raise FileNotFoundError(f"输入文件不存在: {geojson_path}")
+
     try:
         # 加载熟悉点坐标
         familiar_points = load_familiar_points_from_geojson(geojson_path)
-        print(f"成功加载 {len(familiar_points)} 个熟悉点:")
+        print(f"成功加载 {len(familiar_points)} 个熟悉点:") 
         for i, (x, y) in enumerate(familiar_points):
             print(f"  点 {i+1}: ({x}, {y})")
         
         # 将坐标转换为吸引力点格式 (x, y, radius, attraction)
         # 默认设置：半径为5，吸引力为80
-        default_radius = 10
+        default_radius = 30
         default_attraction = 80
         
         attraction_points = []
@@ -170,18 +176,21 @@ if __name__ == "__main__":
         # 生成 JSON 格式的吸引力矩阵
         json_output = generate_attraction_matrix_direct(m, n, attraction_points)
         
-        # 保存为 JSON 文件
-        output_path = os.path.join(project_root, "env_data", "attraction_matrix_familiar_points.json")
-        
-        with open(output_path, "w") as f:
-            json.dump(json_output, f, indent=4)
+        # 保存为 JSON 文件（写到 data/env_data/ 下，和脚本目录一致）
+        output_path = os.path.join(script_dir, "attraction_matrix_familiar_points.json")
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(json_output, f, indent=4, ensure_ascii=False)
         
         print(f"\n熟悉点吸引力矩阵 JSON 文件已生成: {output_path}")
         print("文件大小:", len(json_output["macro_environment"]["map"]), "个数据点")
         
-    except FileNotFoundError:
-        print(f"错误: 找不到文件 {geojson_path}")
-        print("请确保 transformed_familiar_point.geojson 文件存在于 data/output/ 目录中")
+    except FileNotFoundError as e:
+        # 这里可能是输入文件不存在，也可能是输出目录/文件无法创建
+        print(f"错误: {e}")
+        print(f"输入文件路径: {geojson_path}")
+        print(f"输出文件路径: {output_path if 'output_path' in locals() else '(尚未生成)'}")
     except Exception as e:
         print(f"处理文件时出错: {e}")
 

@@ -1,5 +1,6 @@
 #这个test.py是用来测试pyflame的可视性的
-
+import os
+os.add_dll_directory("C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.6\\bin")
 from pyflamegpu import *
 import pyflamegpu.codegen
 import sys
