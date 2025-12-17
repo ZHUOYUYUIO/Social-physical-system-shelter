@@ -41,6 +41,10 @@ def initialize_shelter_agent_population(model, cuda_model, index_vector, shelter
         shelter_agent.setVariableInt("shelter_id", pt['index'])
         shelter_agent.setVariableInt("graph_id", pt['graph_id'])
         shelter_agent.setVariableFloat("z", 0.0)
+        # 容量机制：初始占用人数/是否可用
+        # 注意：需要与你的模型里 shelter_agent 变量定义保持一致
+        shelter_agent.setVariableInt("occupancy", 0)
+        shelter_agent.setVariableInt("available", 1)
 
     cuda_model.setPopulationData(shelterAgentPopulation)
     print("shelter代理种群初始化完成")
