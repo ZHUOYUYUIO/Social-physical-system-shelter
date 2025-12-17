@@ -1,0 +1,81 @@
+
+
+```{r}
+pkgs <- c("rjags", "coda")
+
+for (p in pkgs) {
+  if (!requireNamespace(p, quietly = TRUE)) {
+    install.packages(p, dependencies = TRUE)
+  }
+  library(p, character.only = TRUE)
+}
+
+library(rjags)
+library(coda)
+
+### please download jags software from the website.https://sourceforge.net/projects/mcmc-jags/
+
+```
+
+
+```{r}
+model_string <- "
+model{
+  for (s in 1:S) {
+    # N: discrete uniform 100..250 (implemented via categorical)
+    Nidx[s] ~ dcat(pN[])
+    N[s] <- Nvals[Nidx[s]]
+
+    # Pc, Pm: truncated normal to [0,1]
+    Pc[s] ~ dnorm(muPc, tauPc) T(0,1)
+    Pm[s] ~ dnorm(muPm, tauPm) T(0,1)
+  }
+
+  muPc <- 0.7
+  tauPc <- pow(0.1, -2)
+
+  muPm <- 0.18
+  tauPm <- pow(0.06, -2)
+}
+"
+
+Nvals <- 30:90
+pN <- rep(1/length(Nvals), length(Nvals))
+
+data_list <- list(
+  S = 50,            # 生成多少组参数
+  pN = pN,
+  Nvals = Nvals
+)
+
+inits <- function() list(
+  Pc = runif(data_list$S, 0, 1),
+  Pm = runif(data_list$S, 0, 1),
+  Nidx = sample(1:length(Nvals), data_list$S, replace=TRUE)
+)
+
+m <- jags.model(textConnection(model_string), data=data_list, inits=inits, n.chains=1, quiet=TRUE)
+update(m, 500, progress.bar="none")  # burn-in
+
+samp <- coda.samples(
+  m,
+  variable.names=c("N","Pc","Pm"),
+  n.iter=1000,
+  progress.bar="none"
+)
+
+mat <- as.matrix(samp)
+
+K <- 50
+iter <- 1  # 选用第1次迭代；也可以改成 sample(1:nrow(mat), 1)
+
+df <- data.frame(
+  population_size = as.numeric(mat[iter, sprintf("N[%d]", 1:K)]),
+  crossover_prob  = as.numeric(mat[iter, sprintf("Pc[%d]", 1:K)]),
+  mutation_prob   = as.numeric(mat[iter, sprintf("Pm[%d]", 1:K)])
+)
+
+head(df, 10)
+write.csv(df, "ga_params_monte_carlo_rjags.csv", row.names=FALSE, fileEncoding="UTF-8")
+```
+
