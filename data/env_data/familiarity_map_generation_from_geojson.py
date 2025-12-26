@@ -89,7 +89,7 @@ def generate_attraction_matrix(
 def generate_attraction_matrix_direct(
     m, n,
     attraction_points,  # [(x, y, radius, base_attraction)]
-    decay_rate=0.8,     # 每层衰减比例 (0~1)
+    decay_rate=0.97,     # 每层衰减比例 (0~1)
     normalize=False,
     output_json=True
 ):
@@ -162,8 +162,8 @@ if __name__ == "__main__":
         
         # 将坐标转换为吸引力点格式 (x, y, radius, attraction)
         # 默认设置：半径为5，吸引力为80
-        default_radius = 30
-        default_attraction = 80
+        default_radius = 150
+        default_attraction = 200
         
         attraction_points = []
         for x, y in familiar_points:

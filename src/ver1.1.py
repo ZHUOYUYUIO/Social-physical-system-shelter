@@ -251,35 +251,95 @@ def set_target_stairwell(message_in: pyflamegpu.MessageSpatial3D, message_out: p
 
 @pyflamegpu.agent_function
 def set_target_shelter_first(message_in: pyflamegpu.MessageSpatial3D, message_out: pyflamegpu.MessageNone):
+    """按权重概率选择 shelter（含容量过滤）。
+
+    权重 w = familiarity(m,n) / dist
+    P(选择 i) = w_i / sum(w)
+    """
     x = pyflamegpu.getVariableFloat("x")
     y = pyflamegpu.getVariableFloat("y")
     z = pyflamegpu.getVariableFloat("z")
-    
-    max_value = 0
 
-    if pyflamegpu.getVariableInt("is_set_shelter") == -1:
-        for message in message_in(x,y,z):
-            shelter_x = message.getVariableFloat("x")
-            shelter_y = message.getVariableFloat("y")
+    if pyflamegpu.getVariableInt("is_set_shelter") != -1:
+        return pyflamegpu.ALIVE
 
-            dx = shelter_x - x  
-            dy = shelter_y - y
-            dist = math.sqrtf(dx*dx + dy*dy)
-            dist_value = math.sqrtf(100/dist)
-            m=int(shelter_x)
-            n=int(shelter_y)
-            map = pyflamegpu.environment.getMacroPropertyFloat("map", 700,700)
-            value_familiarity = math.sqrtf(map[m][n])
-            value = value_familiarity + dist_value 
-            if value > max_value:
-                max_value = value
-                pyflamegpu.setVariableInt("target_shelter_id", message.getVariableInt("shelter_id"))
-                pyflamegpu.setVariableFloat("target_shelter_x", shelter_x)
-                pyflamegpu.setVariableFloat("target_shelter_y", shelter_y)
-                pyflamegpu.setVariableInt("is_set_shelter", 1)
-                pyflamegpu.setVariableInt("end_id", message.getVariableInt("graph_id"))   
+    fmap = pyflamegpu.environment.getMacroPropertyFloat("map", 700, 700)
 
-    
+    total_w = 0.0
+    for message in message_in(x, y, z):
+        # 容量机制：跳过满员 shelter（如果你的 shelter_message 没有该字段，可删除此判断）
+        if message.getVariableInt("available") == 0:
+            continue
+
+        shelter_x = message.getVariableFloat("x")
+        shelter_y = message.getVariableFloat("y")
+
+        dx = shelter_x - x
+        dy = shelter_y - y
+        dist = math.sqrtf(dx * dx + dy * dy)
+        if dist <= 1e-6:
+            continue
+
+        m = int(shelter_x)
+        n = int(shelter_y)
+        if m < 0:
+            m = 0
+        elif m > 699:
+            m = 699
+        if n < 0:
+            n = 0
+        elif n > 699:
+            n = 699
+
+        familiarity = math.sqrtf(fmap[m][n]) + 200.0
+        w = familiarity / dist
+        if w > 0.0:
+            total_w += w
+
+    if total_w <= 0.0:
+        return pyflamegpu.ALIVE
+
+    r = pyflamegpu.random.uniformFloat() * total_w
+    cum_w = 0.0
+
+    for message in message_in(x, y, z):
+        if message.getVariableInt("available") == 0:
+            continue
+
+        shelter_x = message.getVariableFloat("x")
+        shelter_y = message.getVariableFloat("y")
+
+        dx = shelter_x - x
+        dy = shelter_y - y
+        dist = math.sqrtf(dx * dx + dy * dy)
+        if dist <= 1e-6:
+            continue
+
+        m = int(shelter_x)
+        n = int(shelter_y)
+        if m < 0:
+            m = 0
+        elif m > 699:
+            m = 699
+        if n < 0:
+            n = 0
+        elif n > 699:
+            n = 699
+
+        familiarity = math.sqrtf(fmap[m][n]) + 200.0
+        w = familiarity / dist
+        if w <= 0.0:
+            continue
+
+        cum_w += w
+        if cum_w >= r:
+            pyflamegpu.setVariableInt("target_shelter_id", message.getVariableInt("shelter_id"))
+            pyflamegpu.setVariableFloat("target_shelter_x", shelter_x)
+            pyflamegpu.setVariableFloat("target_shelter_y", shelter_y)
+            pyflamegpu.setVariableInt("is_set_shelter", 1)
+            pyflamegpu.setVariableInt("end_id", message.getVariableInt("graph_id"))
+            break
+
     return pyflamegpu.ALIVE
 
                 

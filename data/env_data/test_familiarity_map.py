@@ -27,7 +27,7 @@ model = pyflamegpu.ModelDescription("F_MAP_tutorial")
 
 
 env = model.Environment()
-env.newMacroPropertyFloat("map", 500, 500)
+env.newMacroPropertyFloat("map", 700, 700)
 
 
 # Define an agent named point
@@ -45,7 +45,7 @@ def map_get(message_in: pyflamegpu.MessageNone, message_out: pyflamegpu.MessageN
   m=int(x1)
   n=int(y1)
   #获取我们env里的map值
-  map = pyflamegpu.environment.getMacroPropertyFloat("map", 500,500)
+  map = pyflamegpu.environment.getMacroPropertyFloat("map", 700,700)
   map_point = map[m][n] 
 
 
@@ -82,8 +82,8 @@ ENV_WIDTH=500
 AgentPopulation = pyflamegpu.AgentVector(model.Agent("point"), AGENT_COUNT)
 for i in range(AGENT_COUNT):
     agent = AgentPopulation[i]
-    agent.setVariableFloat("x", 210)
-    agent.setVariableFloat("y", 303)
+    agent.setVariableFloat("x", 204)
+    agent.setVariableFloat("y", 69)
 
 cuda_model.setPopulationData(AgentPopulation)
 
