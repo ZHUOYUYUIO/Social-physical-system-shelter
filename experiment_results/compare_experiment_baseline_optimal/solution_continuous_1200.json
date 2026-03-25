@@ -1,0 +1,58 @@
+{
+  "mode": "cap",
+  "k": 6,
+  "capacity_per_shelter": 1200.0,
+  "total_weighted_distance": 464686.91478120716,
+  "chosen_shelters": [
+    {
+      "candidate_index": 33,
+      "shelter_id": 33,
+      "x": 260.0,
+      "y": 540.0,
+      "graph_id": 111
+    },
+    {
+      "candidate_index": 37,
+      "shelter_id": 37,
+      "x": 280.0,
+      "y": 400.0,
+      "graph_id": 115
+    },
+    {
+      "candidate_index": 45,
+      "shelter_id": 45,
+      "x": 320.0,
+      "y": 260.0,
+      "graph_id": 123
+    },
+    {
+      "candidate_index": 50,
+      "shelter_id": 50,
+      "x": 340.0,
+      "y": 260.0,
+      "graph_id": 128
+    },
+    {
+      "candidate_index": 66,
+      "shelter_id": 66,
+      "x": 440.0,
+      "y": 140.0,
+      "graph_id": 144
+    },
+    {
+      "candidate_index": 70,
+      "shelter_id": 70,
+      "x": 480.0,
+      "y": 60.0,
+      "graph_id": 148
+    }
+  ],
+  "inputs": {
+    "graph": "D:\\progamming\\python_script\\Social-physical-system-shelter\\data\\env_data\\expanded_visibility_graph_renumbered.json",
+    "shelter_csv": "D:\\progamming\\python_script\\Social-physical-system-shelter\\data\\output\\shelter_points_with_graph_id.csv",
+    "population_csv": "D:\\progamming\\python_script\\Social-physical-system-shelter\\data\\output\\population_points.csv",
+    "outstop_geojson": "D:\\progamming\\python_script\\Social-physical-system-shelter\\data\\output\\stairwell_withoutput.geojson",
+    "demand_count": 28,
+    "candidate_count": 71
+  }
+}
