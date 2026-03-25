@@ -1,0 +1,11 @@
+pyflamegpu==2.0.0rc2+cuda120.vis
+deap
+numpy==2.3.5
+pandas
+geopandas
+shapely
+pyproj
+PyYAML
+matplotlib
+seaborn
+plotly
