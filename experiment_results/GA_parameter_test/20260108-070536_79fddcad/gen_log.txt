@@ -1,0 +1,2 @@
+# GA run_dir=experiments/ga_shelter/20260108-070536_79fddcad
+49# 0.617, 0.664, ngen=200 pop_n=32 tournsize=3
